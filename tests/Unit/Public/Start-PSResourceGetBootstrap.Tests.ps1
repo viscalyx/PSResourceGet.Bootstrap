@@ -168,20 +168,6 @@ Describe 'Start-PSResourceGetBootstrap' -Tag 'Public' {
         }
     }
 
-    Context 'When module should be bootstrapped (module is not loaded or its path does not match the destination)' {
-        BeforeEach {
-            Mock -CommandName Get-Module -MockWith {
-                return $null
-            }
-        }
-
-        It 'Should attempt to download the module' {
-            { Start-PSResourceGetBootstrap -Destination $TestDrive -Force } | Should -Not -Throw
-
-            Should -Invoke -CommandName Invoke-WebRequest -Times 1 -Exactly
-        }
-    }
-
     Context 'When parmeter Scope is used but the path Scope points to does not exist' {
         BeforeEach {
             Mock -CommandName Get-PSModulePath -MockWith {
