@@ -33,14 +33,25 @@ Describe 'Start-PSResourceGetBootstrap' {
         It 'Should bootstrap the module to the specified scope' {
             { Start-PSResourceGetBootstrap -Scope 'AllUsers' -Force -Verbose } | Should -Not -Throw
 
-            Get-Module -Name $moduleName -ListAvailable -Scope 'AllUsers' | Should -Not -BeNullOrEmpty
+            $allUsersPath = Get-PSModulePath -Scope 'AllUsers'
+
+            Get-Module $moduleName -ListAvailable | Where-Object -FilterScript {
+                $_.Path -match [System.Text.RegularExpressions.Regex]::Escape($allUsersPath)
+            } | Should -Not -BeNullOrEmpty
         }
 
         It 'Should bootstrap the module and compatibility to the specified scope' {
             { Start-PSResourceGetBootstrap -Scope 'CurrentUser' -UseCompatibilityModule -Force -Verbose } | Should -Not -Throw
 
-            Get-Module -Name $moduleName -ListAvailable -Scope 'CurrentUser' | Should -Not -BeNullOrEmpty
-            Get-Module -Name $compatibilityModuleName -ListAvailable -Scope 'CurrentUser' | Should -Not -BeNullOrEmpty
+            $currentUserPath = Get-PSModulePath -Scope 'CurrentUser'
+
+            Get-Module $moduleName -ListAvailable | Where-Object -FilterScript {
+                $_.Path -match [System.Text.RegularExpressions.Regex]::Escape($currentUserPath)
+            } | Should -Not -BeNullOrEmpty
+
+            Get-Module $compatibilityModuleName -ListAvailable | Where-Object -FilterScript {
+                $_.Path -match [System.Text.RegularExpressions.Regex]::Escape($currentUserPath)
+            } | Should -Not -BeNullOrEmpty
         }
     }
 
