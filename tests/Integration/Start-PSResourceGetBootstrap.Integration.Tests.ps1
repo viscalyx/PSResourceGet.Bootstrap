@@ -41,9 +41,12 @@ Describe 'Start-PSResourceGetBootstrap' {
         }
 
         It 'Should bootstrap the module and compatibility to the specified scope' {
-            { Start-PSResourceGetBootstrap -Scope 'CurrentUser' -UseCompatibilityModule -Force -Verbose } | Should -Not -Throw
-
             $currentUserPath = Get-PSModulePath -Scope 'CurrentUser'
+
+            # Must create the path first, otherwise the test will fail if it does not exist.
+            New-Item -Path $currentUserPath -ItemType 'Directory' -Force | Out-Null
+
+            { Start-PSResourceGetBootstrap -Scope 'CurrentUser' -UseCompatibilityModule -Force -Verbose } | Should -Not -Throw'
 
             Get-Module $moduleName -ListAvailable | Where-Object -FilterScript {
                 $_.Path -match [System.Text.RegularExpressions.Regex]::Escape($currentUserPath)
