@@ -92,7 +92,7 @@ Describe 'Start-PSResourceGetBootstrap' -Tag 'Public' {
     Context 'When provided with valid parameters' {
         Context 'Weh using parameter set Scope' {
             It 'Should not throw any exceptions' {
-                { Start-PSResourceGetBootstrap -Scope 'CurrentUser' -Version '1.0.0' -UseCompatibilityModule -CompatibilityModuleVersion '[3.0.22,]' -Force } | Should -Not -Throw
+                { Start-PSResourceGetBootstrap -Scope 'AllUsers' -Version '1.0.0' -UseCompatibilityModule -CompatibilityModuleVersion '[3.0.22,]' -Force } | Should -Not -Throw
             }
         }
 
@@ -154,7 +154,7 @@ Describe 'Start-PSResourceGetBootstrap' -Tag 'Public' {
         }
     }
 
-    Context 'When module is not loaded or its path does not match the destination' {
+    Context 'When module should be bootstrapped (module is not loaded or its path does not match the destination)' {
         BeforeEach {
             Mock -CommandName Get-Module -MockWith {
                 return $null
@@ -168,7 +168,7 @@ Describe 'Start-PSResourceGetBootstrap' -Tag 'Public' {
         }
     }
 
-    Context 'When compatibility module should be saved' {
+    Context 'When module should be bootstrapped (module is not loaded or its path does not match the destination)' {
         BeforeEach {
             Mock -CommandName Get-Module -MockWith {
                 return $null
@@ -176,9 +176,23 @@ Describe 'Start-PSResourceGetBootstrap' -Tag 'Public' {
         }
 
         It 'Should attempt to download the module' {
-            { Start-PSResourceGetBootstrap -Destination $TestDrive -UseCompatibilityModule -Force } | Should -Not -Throw
+            { Start-PSResourceGetBootstrap -Destination $TestDrive -Force } | Should -Not -Throw
 
             Should -Invoke -CommandName Invoke-WebRequest -Times 1 -Exactly
+        }
+    }
+
+    Context 'When parmeter Scope is used but the path Scope points to does not exist' {
+        BeforeEach {
+            Mock -CommandName Get-PSModulePath -MockWith {
+                return "$TestDrive/MissingFolder"
+            }
+        }
+
+        It 'Should attempt to download the module' {
+            { Start-PSResourceGetBootstrap -Scope 'CurrentUser' -UseCompatibilityModule -Force } | Should -Throw 'The path*does not exist for the scope*'
+
+            Should -Invoke -CommandName Invoke-WebRequest -Times 0 -Exactly
         }
     }
 
