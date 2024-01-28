@@ -46,7 +46,7 @@ Describe 'Start-PSResourceGetBootstrap' {
             # Must create the path first, otherwise the test will fail if it does not exist.
             New-Item -Path $currentUserPath -ItemType 'Directory' -Force | Out-Null
 
-            { Start-PSResourceGetBootstrap -Scope 'CurrentUser' -UseCompatibilityModule -Force -Verbose } | Should -Not -Throw'
+            { Start-PSResourceGetBootstrap -Scope 'CurrentUser' -UseCompatibilityModule -Force -Verbose } | Should -Not -Throw
 
             Get-Module $moduleName -ListAvailable | Where-Object -FilterScript {
                 $_.Path -match [System.Text.RegularExpressions.Regex]::Escape($currentUserPath)
