@@ -37,6 +37,9 @@
         Forces the operation without prompting for confirmation. This is useful when
         running the script in non-interactive mode.
 
+    .PARAMETER ImportModule
+        Indicates whether to import the module after it has been downloaded.
+
     .OUTPUTS
         None.
 
@@ -134,7 +137,18 @@ function Start-PSResourceGetBootstrap
         {
             $verboseDescriptionMessage = $script:localizedData.Start_PSResourceGetBootstrap_Scope_ShouldProcessVerboseDescription -f $name, $Scope
 
-            $Destination = Get-PSModulePath -Scope $Scope
+            $scopeModulePath = Get-PSModulePath -Scope $Scope
+
+            if (-not (Test-Path -Path $scopeModulePath))
+            {
+                # cSpell: ignore SPSRGB
+                $exception = New-Exception -Message ($script:localizedData.Start_PSResourceGetBootstrap_MissingScopePath -f $scopeModulePath, $Scope)
+                $errorRecord = New-ErrorRecord -Exception $exception -ErrorId 'SPSRGB0004' -ErrorCategory 'InvalidOperation' -TargetObject $name
+
+                $PSCmdlet.ThrowTerminatingError($errorRecord)
+            }
+
+            $Destination = $scopeModulePath
 
             Write-Debug -Message ($script:localizedData.Start_PSResourceGetBootstrap_Scope_SaveModule -f $Scope, $Destination)
         }
@@ -188,7 +202,6 @@ function Start-PSResourceGetBootstrap
             }
             catch
             {
-                # cSpell: ignore SPSRGB
                 $exception = New-Exception -ErrorRecord $_ -Message ($script:localizedData.Start_PSResourceGetBootstrap_FailedDownload -f $name)
                 $errorRecord = New-ErrorRecord -Exception $exception -ErrorId 'SPSRGB0001' -ErrorCategory 'InvalidOperation' -TargetObject $name
 

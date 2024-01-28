@@ -22,4 +22,5 @@ ConvertFrom-StringData @'
     Start_PSResourceGetBootstrap_CompatibilityModule_ShouldProcessVerboseWarning = Are you sure you want to save '{0}'?
     # This string shall not end with full stop (.) since it is used as a title of ShouldProcess messages.
     Start_PSResourceGetBootstrap_CompatibilityModule_ShouldProcessCaption = Saving {0}
+    Start_PSResourceGetBootstrap_MissingScopePath = The path '{0}' does not exist for the scope '{1}'. Please make sure the path exists and try again.
 '@
