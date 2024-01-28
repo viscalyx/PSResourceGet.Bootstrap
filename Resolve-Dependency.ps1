@@ -937,14 +937,20 @@ try
 
                 $percentagePerModule = [System.Math]::Floor(100 / $modulesToSave.Length)
 
-                $syncProgress = [System.Collections.Hashtable]::Synchronized(@{ProgressPercentage = 0})
+                # Inspired from https://stackoverflow.com/questions/67114770/are-non-concurrent-collections-safe-inside-concurrent-collections
+                $syncProgress  = [System.Collections.Concurrent.ConcurrentDictionary[string, int]]::new()
 
-                Write-Progress -Activity 'PSResourceGet:' -PercentComplete $syncProgress.ProgressPercentage -CurrentOperation 'Restoring Build Dependencies'
+                # The variable $progressPercent will not be the same one as inside the parallell foreach loop.
+                $progressPercent = $syncProgress.GetOrAdd('ProgressPercentage', { param($key) return 0 })
 
-                $modulesToSave | ForEach-Object -Parallel {
+                Write-Progress -Activity 'PSResourceGet:' -PercentComplete $progressPercent -CurrentOperation 'Restoring Build Dependencies'
+
+                $modulesToSave | ForEach-Object -ThrottleLimit 5 -Parallel {
                     $currentModule = $_
 
                     $syncProgressCopy = $using:syncProgress
+
+                    $progressPercent = $syncProgressCopy.AddOrUpdate('ProgressPercentage', { param($key) return 0 }, { param($key, $value) return $value + $using:percentagePerModule })
 
                     $savePSResourceParameters = @{
                         Path            = $using:PSDependTarget
@@ -960,13 +966,13 @@ try
 
                     if ($savePSResourceParameters.Name -in $skipModule -and (Get-Module -Name $savePSResourceParameters.Name))
                     {
-                        Write-Progress -Activity 'PSResourceGet:' -PercentComplete $syncProgressCopy.ProgressPercentage -CurrentOperation 'Restoring Build Dependencies' -Status ('Skipping module {0}' -f $savePSResourceParameters.Name)
+                        Write-Progress -Activity 'PSResourceGet:' -PercentComplete $progressPercent -CurrentOperation 'Restoring Build Dependencies' -Status ('Skipping module {0}' -f $savePSResourceParameters.Name)
 
                         Write-Information -MessageData ('Skipping the module {0} since it cannot be refresh while loaded into the session. To refresh the module open a new session and resolve dependencies again.' -f $savePSResourceParameters.Name) -InformationAction 'Continue'
                     }
                     else
                     {
-                        Write-Progress -Activity 'PSResourceGet:' -PercentComplete $syncProgressCopy.ProgressPercentage -CurrentOperation 'Restoring Build Dependencies' -Status ('Saving module {0}' -f $savePSResourceParameters.Name)
+                        Write-Progress -Activity 'PSResourceGet:' -PercentComplete $progressPercent -CurrentOperation 'Restoring Build Dependencies' -Status ('Saving module {0}' -f $savePSResourceParameters.Name)
 
                         # Clear all module from the current session so any new version fetched will be re-imported.
                         Get-Module -Name $savePSResourceParameters.Name | Remove-Module -Force
@@ -979,7 +985,7 @@ try
                         }
                     }
 
-                    $syncProgressCopy.progressPercentage += $using:percentagePerModule
+                    #$syncProgressCopy.progressPercentage += $using:percentagePerModule
                 }
 
                 Write-Progress -Activity 'PSResourceGet:' -PercentComplete 100 -CurrentOperation 'Restoring Build Dependencies' -Completed
