@@ -13,6 +13,7 @@ BuildWorkflow:
     - Build_Module_ModuleBuilder
     - Build_NestedModules_ModuleBuilder
     - Create_Changelog_Release_Output
+    - Update_Bootstrap_Script
 
   docs:
     - Generate_Conceptual_Help
@@ -196,6 +197,7 @@ GitHubConfig:
     - 'CHANGELOG.md'
   ReleaseAssets:
     - output/WikiContent.zip
+    - output/bootstrap.ps1
   GitHubConfigUserName: johlju # cSpell: disable-line
   GitHubConfigUserEmail: johan.ljunggren@shamn.se
   UpdateChangelogOnPrerelease: false
