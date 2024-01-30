@@ -37,7 +37,7 @@ BeforeDiscovery {
     $repositoryPath = Resolve-Path -Path (Join-Path -Path $PSScriptRoot -ChildPath '../..')
     $sourcePath = Join-Path -Path $repositoryPath -ChildPath 'source'
 
-    $moduleFiles = Get-ChildItem -Path $sourcePath -Recurse -Include @('*.psm1', '*.ps1')
+    $moduleFiles = Get-ChildItem -Path $sourcePath -Recurse -Include @('*.psm1', '*.ps1') -Exclude 'bootstrap.ps1'
 
     $testCases = @()
 
