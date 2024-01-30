@@ -52,11 +52,11 @@ task Update_Bootstrap_Script {
 
         # Find the Start-PSResourceGetBootstrap function definition
         $functionDefinition = $ast.Find({
-            param($node)
+                param($node)
 
-            return $node -is [System.Management.Automation.Language.FunctionDefinitionAst] -and
-                   $node.Name -eq 'Start-PSResourceGetBootstrap'
-        }, $true)
+                return $node -is [System.Management.Automation.Language.FunctionDefinitionAst] -and
+                $node.Name -eq 'Start-PSResourceGetBootstrap'
+            }, $true)
 
         return $functionDefinition
     }
@@ -64,48 +64,86 @@ task Update_Bootstrap_Script {
     # Get the vales for task variables, see https://github.com/gaelcolas/Sampler#task-variables.
     . Set-SamplerTaskVariable
 
+    Write-Build -Color 'Magenta' -Text 'Updating bootstrap script.'
+
     Remove-Item -Path "$OutputDirectory/bootstrap.ps1" -Force -ErrorAction 'SilentlyContinue'
 
-    # Copy the bootstrap script to the build output folder
+    Write-Build -Color 'DarkGray' -Text "`tCopy the bootstrap script to the build output folder."
     Copy-Item -Path "$SourcePath/Scripts/bootstrap.ps1" -Destination $OutputDirectory
 
+    Write-Build -Color 'DarkGray' -Text "`tGet the content of the bootstrap script."
     $builtBootstrapScript = Get-Content -Path "$OutputDirectory/bootstrap.ps1" -Raw
 
-    # Set version and date in the bootstrap script
+    Write-Build -Color 'DarkGray' -Text "`tSet version and date in the bootstrap script."
     $builtBootstrapScript = $builtBootstrapScript.Replace('v#.#.#', $ModuleVersion)
     $builtBootstrapScript = $builtBootstrapScript.Replace('yyyy-MM-dd', (Get-Date -Format 'yyyy-MM-dd'))
 
+    Write-Build -Color 'DarkGray' -Text "`tGet the function definition for the Start-PSResourceGetBootstrap function."
     $functionDefinition = Get-StartPSResourceGetBootstrapFunctionDefinition
 
-    #Write-Verbose -Message "Found function definition: $($functionDefinition.Name)" -Verbose
-    #Write-Verbose -Message "Found function definition: $(($functionDefinition.GetHelpContent()).GetCommentBlock())" -Verbose
-    #Write-Verbose -Message "Found function definition body: $($functionDefinition.Body.Extent.Text)" -Verbose
-    #Write-Verbose -Message "Found function definition body: $($functionDefinition.Extent.Text)" -Verbose
-    #Write-Verbose -Message "Found function definition body param block: $($functionDefinition.Body.ParamBlock)" -Verbose
-    #Write-Verbose -Message "Found function definition body param block: $($functionDefinition.Body.ParamBlock)" -Verbose
-    #Write-Verbose -Message "Found function definition body param block parameters: $($functionDefinition.Body.ParamBlock.Parameters)" -Verbose
+    Write-Build -Color 'DarkGray' -Text "`t`tGet the parameter block for the Start-PSResourceGetBootstrap function."
+    $parameterBlockString = $functionDefinition.Body.ParamBlock.Extent.Text
 
-    $commandParameterBlock = $functionDefinition.Body.ParamBlock
-
-    $parameterBlockString = $commandParameterBlock.Extent.Text
-
-    # Set parameters in the bootstrap script
-    #$builtBootstrapScript = $builtBootstrapScript -replace '(\#region parameters)(?s)(.*)(\#endregion parameters)', "`$1`n$($commandParameterBlock.Extent.Text)`n`$3"
+    Write-Build -Color 'DarkGray' -Text "`tSet parameters in the bootstrap script"
     $builtBootstrapScript = $builtBootstrapScript.Replace('#placeholder parameters', $parameterBlockString)
 
-    # # Copy the content of the en-US localized strings file to the 'localization' region in the bootstrap script
+    Write-Build -Color 'DarkGray' -Text "`tGet the localization content."
     $localizationContent = Get-Content -Path "$SourcePath/en-US/PSResourceGet.Bootstrap.strings.psd1" -Raw
 
-    # Set localization in the bootstrap script
+    Write-Build -Color 'DarkGray' -Text "`t`tRemove the comment-based help from the localization content."
+    $regex = [System.Text.RegularExpressions.RegEx]::new(' *<#(?s).*#>\r?\n*', [System.Text.RegularExpressions.RegexOptions]::Multiline)
+    $localizationContent = $regex.Replace($localizationContent, '')
+
+    Write-Build -Color 'DarkGray' -Text "`tSet localization in the bootstrap script."
     $builtBootstrapScript = $builtBootstrapScript.Replace('#placeholder localization', "`$script:localizedData = `n$localizationContent")
 
+    Write-Build -Color 'DarkGray' -Text "`tGet the comment-based help for the Start-PSResourceGetBootstrap function."
     $commentBasedHelp = ($functionDefinition.GetHelpContent()).GetCommentBlock()
-
     $functionDefinitionString = $functionDefinition.Extent.Text
 
+    Write-Build -Color 'DarkGray' -Text "`tSet comment-based help in the bootstrap script."
     $builtBootstrapScript = $builtBootstrapScript.Replace('#placeholder Start-PSResourceGetBootstrap', "$($commentBasedHelp)$($functionDefinitionString)")
 
     Write-Debug -Message "Updated bootstrap script:`n$builtBootstrapScript"
 
+    Write-Build -Color 'DarkGray' -Text "`tNormalize line endings."
+    $builtBootstrapScript = $builtBootstrapScript -replace '\r?\n', "`n"
+
+    Write-Build -Color 'DarkGray' -Text "`tRemove single line comments (but keep the top version comment)."
+    $regex = [System.Text.RegularExpressions.RegEx]::new('^(?!.*\#\>)(?!.*[Vv]ersion) *#.*\r?\n?$', [System.Text.RegularExpressions.RegexOptions]::Multiline)
+    $builtBootstrapScript = $regex.Replace($builtBootstrapScript, '')
+
+    $settings = @{
+        IncludeRules = @('PSPlaceOpenBrace', 'PSUseConsistentIndentation', 'PSUseConsistentWhitespace')
+        Rules        = @{
+            PSPlaceOpenBrace           = @{
+                Enable     = $true
+                OnSameLine = $true
+            }
+            PSUseConsistentIndentation = @{
+                Enable              = $true
+                IndentationSize     = 2
+                PipelineIndentation = 'IncreaseIndentationForFirstPipeline'
+                Kind                = 'space'
+            }
+            PSUseConsistentWhitespace  = @{
+                Enable                                  = $true
+                CheckInnerBrace                         = $true
+                CheckOpenBrace                          = $true
+                CheckOpenParen                          = $true
+                CheckOperator                           = $true
+                CheckPipe                               = $true
+                CheckPipeForRedundantWhitespace         = $false
+                CheckSeparator                          = $true
+                CheckParameter                          = $false
+                IgnoreAssignmentOperatorInsideHashTable = $false
+            }
+        }
+    }
+
+    Write-Build -Color 'DarkGray' -Text "`tFormat the bootstrap script."
+    $builtBootstrapScript = Invoke-Formatter -ScriptDefinition $builtBootstrapScript -Settings $settings
+
+    Write-Build -Color 'DarkGray' -Text "`tWrite the bootstrap script to the build output folder."
     Set-Content -Path "$OutputDirectory/bootstrap.ps1" -Value $builtBootstrapScript
 }
