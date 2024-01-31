@@ -334,6 +334,41 @@ stages:
               testResultsFiles: '$(buildFolderName)/$(testResultFolderName)/NUnit*.xml'
               testRunTitle: 'Integration ($(JOB_VMIMAGE))'
 
+      - job: Test_Integration_Bootstrap_Script
+        displayName: 'Integration Bootstrap Script'
+        strategy:
+          matrix:
+            SQL2016_WIN2019:
+              JOB_VMIMAGE: 'windows-2019'
+            SQL2016_WIN2022:
+              JOB_VMIMAGE: 'windows-2022'
+        pool:
+          vmImage: $(JOB_VMIMAGE)
+        timeoutInMinutes: 0
+        steps:
+          - task: DownloadPipelineArtifact@2
+            displayName: 'Download Build Artifact'
+            inputs:
+              buildType: 'current'
+              artifactName: $(buildArtifactName)
+              targetPath: '$(Build.SourcesDirectory)/$(buildFolderName)'
+          - powershell: |
+              # Remove the built module so that it cannot be used by the tests.
+              Remove-Item -Path './output/builtModule' -Recurse -Force
+            name: removeBuiltModule
+            displayName: 'Remove Built Module'
+          - powershell: |
+              ./build.ps1 -Tasks test -CodeCoverageThreshold 0 -PesterPath 'tests/Integration/Bootstrap.Integration.Tests.ps1'
+            name: test
+            displayName: 'Run Integration Test'
+          - task: PublishTestResults@2
+            displayName: 'Publish Test Results'
+            condition: succeededOrFailed()
+            inputs:
+              testResultsFormat: 'NUnit'
+              testResultsFiles: '$(buildFolderName)/$(testResultFolderName)/NUnit*.xml'
+              testRunTitle: 'Integration Bootstrap Script ($(JOB_VMIMAGE))'
+
   - stage: Deploy
     dependsOn: Test
     condition: |
