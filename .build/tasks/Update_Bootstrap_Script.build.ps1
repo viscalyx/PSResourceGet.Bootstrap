@@ -82,7 +82,7 @@ task Update_Bootstrap_Script {
     $functionDefinition = Get-StartPSResourceGetBootstrapFunctionDefinition
 
     Write-Build -Color 'DarkGray' -Text "`t`tGet the parameter block for the Start-PSResourceGetBootstrap function."
-    $parameterBlockString = $functionDefinition.Body.ParamBlock.Extent.Text
+    $parameterBlockString = "[CmdletBinding(DefaultParameterSetName = 'Scope')]`n" + $functionDefinition.Body.ParamBlock.Extent.Text
 
     Write-Build -Color 'DarkGray' -Text "`tSet parameters in the bootstrap script"
     $builtBootstrapScript = $builtBootstrapScript.Replace('#placeholder parameters', $parameterBlockString)
