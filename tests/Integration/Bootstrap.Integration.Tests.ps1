@@ -29,6 +29,10 @@ Describe 'Bootstrap Script' -Tag 'BootstrapScript' {
         $compatibilityModuleName = 'PowerShellGet'
     }
 
+    It 'Should not have PSResourceGet.Bootstrap module imported in session' {
+        Get-Module -Name 'PSResourceGet.Bootstrap' -All | Should -BeNullOrEmpty
+    }
+
     Context 'When using Scope parameter set' {
         It 'Should bootstrap the module to the specified scope' {
             { & ./output/bootstrap.ps1 -Scope 'AllUsers' -Force -Verbose } | Should -Not -Throw

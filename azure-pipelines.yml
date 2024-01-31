@@ -353,11 +353,6 @@ stages:
               artifactName: $(buildArtifactName)
               targetPath: '$(Build.SourcesDirectory)/$(buildFolderName)'
           - powershell: |
-              # Remove the built module so that it cannot be used by the tests.
-              Remove-Item -Path './output/builtModule' -Recurse -Force
-            name: removeBuiltModule
-            displayName: 'Remove Built Module'
-          - powershell: |
               ./build.ps1 -Tasks test -CodeCoverageThreshold 0 -PesterPath 'tests/Integration' -PesterTag 'BootstrapScript'
             name: test
             displayName: 'Run Integration Test'
