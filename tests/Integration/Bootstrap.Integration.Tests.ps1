@@ -30,6 +30,7 @@ Describe 'Bootstrap Script' -Tag 'BootstrapScript' {
     }
 
     It 'Should not have PSResourceGet.Bootstrap module imported in session' {
+        Get-Module -Name 'PSResourceGet.Bootstrap' -All | Remove-Module -Force -ErrorAction 'SilentlyContinue'
         Get-Module -Name 'PSResourceGet.Bootstrap' -All | Should -BeNullOrEmpty
     }
 
