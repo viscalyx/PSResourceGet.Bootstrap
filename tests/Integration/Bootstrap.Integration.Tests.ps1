@@ -23,7 +23,7 @@ BeforeDiscovery {
     }
 }
 
-Describe 'Bootstrap Script' {
+Describe 'Bootstrap Script' -Tag 'BootstrapScript' {
     BeforeAll {
         $moduleName = 'Microsoft.PowerShell.PSResourceGet'
         $compatibilityModuleName = 'PowerShellGet'

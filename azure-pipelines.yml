@@ -323,7 +323,7 @@ stages:
               script: 'winrm quickconfig -quiet'
               pwsh: false
           - powershell: |
-              ./build.ps1 -Tasks test -CodeCoverageThreshold 0 -PesterPath 'tests/Integration'
+              ./build.ps1 -Tasks test -CodeCoverageThreshold 0 -PesterPath 'tests/Integration' -PesterExcludeTag 'BootstrapScript'
             name: test
             displayName: 'Run Integration Test'
           - task: PublishTestResults@2
@@ -358,7 +358,7 @@ stages:
             name: removeBuiltModule
             displayName: 'Remove Built Module'
           - powershell: |
-              ./build.ps1 -Tasks test -CodeCoverageThreshold 0 -PesterPath 'tests/Integration/Bootstrap.Integration.Tests.ps1'
+              ./build.ps1 -Tasks test -CodeCoverageThreshold 0 -PesterPath 'tests/Integration' -PesterTag 'BootstrapScript'
             name: test
             displayName: 'Run Integration Test'
           - task: PublishTestResults@2
