@@ -101,7 +101,10 @@ task Update_Bootstrap_Script {
     $commentBasedHelp = ($functionDefinition.GetHelpContent()).GetCommentBlock()
     $functionDefinitionString = $functionDefinition.Extent.Text
 
-    Write-Build -Color 'DarkGray' -Text "`tSet comment-based help in the bootstrap script."
+    Write-Build -Color 'DarkGray' -Text "`tAdd the command Get-PSModulePath to the bootstrap script."
+    # TODO: fix the code here
+
+    Write-Build -Color 'DarkGray' -Text "`tAdd the command Start-PSResourceGetBootstrap to the bootstrap script."
     $builtBootstrapScript = $builtBootstrapScript.Replace('#placeholder Start-PSResourceGetBootstrap', "$($commentBasedHelp)$($functionDefinitionString)")
 
     Write-Debug -Message "Updated bootstrap script:`n$builtBootstrapScript"
