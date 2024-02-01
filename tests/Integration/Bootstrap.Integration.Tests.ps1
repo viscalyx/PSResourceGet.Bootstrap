@@ -34,6 +34,11 @@ Describe 'Bootstrap Script' -Tag 'BootstrapScript' {
         Get-Module -Name 'PSResourceGet.Bootstrap' -All | Should -BeNullOrEmpty
     }
 
+    It 'Should not have DscResource.Common module available' {
+        Remove-Item -Path './output/RequiredModules/DscResource.Common' -Recurse -Force
+        Get-Module -Name 'DscResource.Common' -ListAvailable | Should -BeNullOrEmpty -Because 'If the module is available there can be false positive tests.'
+    }
+
     Context 'When using Scope parameter set' {
         It 'Should bootstrap the module to the specified scope' {
             { & ./output/bootstrap.ps1 -Scope 'AllUsers' -Force -Verbose } | Should -Not -Throw
