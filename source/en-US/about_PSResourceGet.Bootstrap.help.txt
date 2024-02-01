@@ -1,0 +1,25 @@
+TOPIC
+    about_PSResourceGet.Bootstrap
+
+SHORT DESCRIPTION
+    Simplify bootstrapping Microsoft.PowerShell.PSResourceGet on systems.
+
+LONG DESCRIPTION
+    This module contain commands to simplify bootstrapping Microsoft.PowerShell.PSResourceGet on systems.
+
+EXAMPLES
+    PS C:\> Get-DscResource -Module PSResourceGet.Bootstrap
+
+NOTE:
+    Thank you to the PSResourceGet.Bootstrap contributors who contributed to this
+    module by writing code, sharing opinions, and provided feedback.
+
+TROUBLESHOOTING NOTE:
+    Go to the Github repository for read about issues, submit a new issue, and read
+    about new releases. https://github.com/viscalyx/PSResourceGet.Bootstrap
+
+SEE ALSO
+    - https://github.com/viscalyx/PSResourceGet.Bootstrap
+
+KEYWORDS
+    PSResourceGet, Bootstrap
