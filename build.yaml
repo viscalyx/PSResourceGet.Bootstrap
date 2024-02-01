@@ -198,8 +198,8 @@ GitHubConfig:
   ReleaseAssets:
     - output/WikiContent.zip
     - output/bootstrap.ps1
-  GitHubConfigUserName: johlju # cSpell: disable-line
-  GitHubConfigUserEmail: johan.ljunggren@shamn.se
+  GitHubConfigUserName: viscalyxbot # cSpell: disable-line
+  GitHubConfigUserEmail: viscalyxbot@viscalyx.se
   UpdateChangelogOnPrerelease: false
 
 ####################################################
