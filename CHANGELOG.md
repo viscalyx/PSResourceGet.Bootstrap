@@ -10,6 +10,10 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - Status badges updated.
 - Update integration tests for the bootstrap script.
 
+### Changed
+
+- Update azure-pipelines.yml.
+
 ## [0.1.0] - 2024-02-01
 
 ### Added

@@ -10,8 +10,6 @@ trigger:
     - "v*"
     exclude:
     - "*-*"
-pr:
-- main
 
 variables:
   buildFolderName: output
