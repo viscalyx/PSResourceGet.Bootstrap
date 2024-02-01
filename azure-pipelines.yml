@@ -12,8 +12,6 @@ trigger:
     - "*-*"
 pr:
 - main
-  autoCancel: false
-  drafts: true
 
 variables:
   buildFolderName: output
