@@ -339,14 +339,8 @@ stages:
             name: test
             displayName: 'Run Integration Test'
             inputs:
-              # filePath: './build.ps1'
-              # arguments: "-Tasks test -CodeCoverageThreshold 0 -PesterPath 'tests/Integration' -PesterExcludeTag 'BootstrapScript'"
-              targetType: 'inline'
-              script: |
-                $ErrorView = 'DetailedView'
-                ./build.ps1 -Tasks test -CodeCoverageThreshold 0 -PesterPath 'tests/Integration' -PesterExcludeTag 'BootstrapScript'
-                Write-Verbose -Message ('Error count: {0}' -f $Error.Count) -Verbose
-                Write-Verbose -Message ($Error | Out-String) -Verbose
+              filePath: './build.ps1'
+              arguments: "-Tasks test -CodeCoverageThreshold 0 -PesterPath 'tests/Integration' -PesterExcludeTag 'BootstrapScript'"
               pwsh: $(PWSH)
           - task: PublishTestResults@2
             displayName: 'Publish Test Results'
