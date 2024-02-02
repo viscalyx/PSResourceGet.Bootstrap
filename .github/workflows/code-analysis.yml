@@ -7,7 +7,7 @@ on:
     branches: [ main ]
   workflow_dispatch:
 
-# cSpell: ignore potatoqualitee codeql SARIF
+# cSpell: ignore codeql SARIF
 jobs:
   pssa:
     name: PSScriptAnalyzer

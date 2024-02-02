@@ -30,8 +30,22 @@ Describe 'Start-PSResourceGetBootstrap' {
     }
 
     Context 'When using Scope parameter set' {
-        It 'Should bootstrap the module to the specified scope' {
+        <#
+            TODO: The test is skipped on Linux, it fails maybe because pwsh needs to run as sudo.
+                  the test is run using sudo in Bootstrap.Integration.Tests.ps1 and seems to work.
+
+            Fails with:
+            System.Exception: Failed to download 'Microsoft.PowerShell.PSResourceGet' from the PowerShell Gallery.
+            ---> System.UnauthorizedAccessException: Access to the path '/usr/local/share/powershell/Modules/Microsoft.PowerShell.PSResourceGet.nupkg' is denied.
+            ---> System.IO.IOException: Permission denied
+        #>
+        It 'Should bootstrap the module to the specified scope AllUsers' -Skip:$IsLinux {
+            $ErrorView = 'DetailedView'
+
             { Start-PSResourceGetBootstrap -Scope 'AllUsers' -Force -Verbose } | Should -Not -Throw
+
+            Write-Verbose -Message ('Error count: {0}' -f $Error.Count) -Verbose
+            Write-Verbose -Message ($Error | Out-String) -Verbose
 
             $allUsersPath = Get-PSModulePath -Scope 'AllUsers'
 
@@ -40,7 +54,7 @@ Describe 'Start-PSResourceGetBootstrap' {
             } | Should -Not -BeNullOrEmpty
         }
 
-        It 'Should bootstrap the module and compatibility to the specified scope' {
+        It 'Should bootstrap the module and compatibility to the specified scope CurrentUser' {
             $currentUserPath = Get-PSModulePath -Scope 'CurrentUser'
 
             # Must create the path first, otherwise the test will fail if it does not exist.

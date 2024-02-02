@@ -191,12 +191,7 @@ function Start-PSResourceGetBootstrap
                     ErrorAction = 'Stop'
                 }
 
-                # $previousProgressPreference = $ProgressPreference
-                # $ProgressPreference = 'SilentlyContinue'
-
                 Invoke-WebRequest @invokeWebRequestParameters
-
-                # $ProgressPreference = $previousProgressPreference
 
                 $moduleAvailable = $true
             }
