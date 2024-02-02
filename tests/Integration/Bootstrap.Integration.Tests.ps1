@@ -53,7 +53,16 @@ Describe 'Bootstrap Script' -Tag 'BootstrapScript' {
 
     Context 'When using Scope parameter set' {
         It 'Should bootstrap the module to the specified scope AllUsers' {
-            { & ./output/bootstrap.ps1 -Scope 'AllUsers' -Force -Verbose } | Should -Not -Throw
+            {
+                if ($IsLinux)
+                {
+                    sudo pwsh -Command "& $PwD/output/bootstrap.ps1 -Scope 'AllUsers' -Force -Verbose"
+                }
+                else
+                {
+                    & ./output/bootstrap.ps1 -Scope 'AllUsers' -Force -Verbose
+                }
+            } | Should -Not -Throw
 
             Get-Module $moduleName -ListAvailable | Where-Object -FilterScript {
                 $_.Path -match [System.Text.RegularExpressions.Regex]::Escape($allUsersPath)
