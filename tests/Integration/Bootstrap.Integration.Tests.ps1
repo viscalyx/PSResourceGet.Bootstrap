@@ -27,23 +27,33 @@ Describe 'Bootstrap Script' -Tag 'BootstrapScript' {
     BeforeAll {
         $moduleName = 'Microsoft.PowerShell.PSResourceGet'
         $compatibilityModuleName = 'PowerShellGet'
+
+        # Get the paths before removing the module DscResource.Common.
+        $allUsersPath = Get-PSModulePath -Scope 'AllUsers'
+        $currentUserPath = Get-PSModulePath -Scope 'CurrentUser'
     }
 
-    It 'Should not have PSResourceGet.Bootstrap module imported in session' {
-        Get-Module -Name 'PSResourceGet.Bootstrap' -All | Remove-Module -Force -ErrorAction 'SilentlyContinue'
-        Get-Module -Name 'PSResourceGet.Bootstrap' -All | Should -BeNullOrEmpty
-    }
+    Context 'Pre-test cleanup' {
+        It 'Should not have PSResourceGet.Bootstrap module imported in session' {
+            Get-Module -Name 'PSResourceGet.Bootstrap' -All | Remove-Module -Force -ErrorAction 'SilentlyContinue'
+            Get-Module -Name 'PSResourceGet.Bootstrap' -All | Should -BeNullOrEmpty
+        }
 
-    It 'Should not have DscResource.Common module available' {
-        Remove-Item -Path './output/RequiredModules/DscResource.Common' -Recurse -Force
-        Get-Module -Name 'DscResource.Common' -ListAvailable | Should -BeNullOrEmpty -Because 'If the module is available there can be false positive tests.'
+        It 'Should not have DscResource.Common module available' {
+            # Remove the module from the session to ensure that the module is not available.
+            Get-Module -Name 'DscResource.Common' -All |
+                Remove-Module -Force -ErrorAction 'SilentlyContinue'
+
+            # Remove the module folder to ensure that the module is not available.
+            Remove-Item -Path './output/RequiredModules/DscResource.Common' -Recurse -Force
+
+            Get-Module -Name 'DscResource.Common' -ListAvailable | Should -BeNullOrEmpty -Because 'If the module is available there could be false positive tests.'
+        }
     }
 
     Context 'When using Scope parameter set' {
         It 'Should bootstrap the module to the specified scope' {
             { & ./output/bootstrap.ps1 -Scope 'AllUsers' -Force -Verbose } | Should -Not -Throw
-
-            $allUsersPath = Get-PSModulePath -Scope 'AllUsers'
 
             Get-Module $moduleName -ListAvailable | Where-Object -FilterScript {
                 $_.Path -match [System.Text.RegularExpressions.Regex]::Escape($allUsersPath)
@@ -51,8 +61,6 @@ Describe 'Bootstrap Script' -Tag 'BootstrapScript' {
         }
 
         It 'Should bootstrap the module and compatibility to the specified scope' {
-            $currentUserPath = Get-PSModulePath -Scope 'CurrentUser'
-
             # Must create the path first, otherwise the test will fail if it does not exist.
             New-Item -Path $currentUserPath -ItemType 'Directory' -Force | Out-Null
 
