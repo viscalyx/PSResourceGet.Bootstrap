@@ -296,7 +296,6 @@ stages:
               bash <(curl -s https://codecov.io/bash) -f "./$(buildFolderName)/$(testResultFolderName)/JaCoCo_coverage.xml" -F unit
             displayName: 'Publish Code Coverage to Codecov.io'
 
-
       - job: Test_Integration
         displayName: 'Integration'
         strategy:
@@ -353,6 +352,8 @@ stages:
 
       - job: Test_Integration_Bootstrap_Script
         displayName: 'Integration Bootstrap Script'
+        dependsOn:
+          - Test_Integration
         strategy:
           matrix:
             WIN2019_PWSH:
