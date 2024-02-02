@@ -47,15 +47,9 @@ task Update_Bootstrap_Script {
             [Parameter(Mandatory = $true)]
             [System.String]
             $CommandName
-
-            # [Parameter(Mandatory = $true)]
-            # [System.String]
-            # $ModuleName
         )
 
-
         # Get the script content
-        #$moduleContent = Get-Content -Path "$BuiltModuleBase/PSResourceGet.Bootstrap.psm1" -Raw
         $moduleContent = (Get-Command $CommandName).Module.Definition
 
         # Parse the script into an AST
@@ -148,7 +142,6 @@ task Update_Bootstrap_Script {
     Write-Build -Color 'DarkGray' -Text "`tRemove single line comments (but keep the top version comment)."
     $regex = [System.Text.RegularExpressions.RegEx]::new('^(?!.*\#\>)(?!.*[Vv]ersion) *#.*\r?\n?$', [System.Text.RegularExpressions.RegexOptions]::Multiline)
     $builtBootstrapScript = $regex.Replace($builtBootstrapScript, '')
-
 
     $settings = @{
         IncludeRules = @('PSPlaceOpenBrace', 'PSUseConsistentIndentation', 'PSUseConsistentWhitespace')
