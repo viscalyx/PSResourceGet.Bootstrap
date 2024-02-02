@@ -191,25 +191,17 @@ function Start-PSResourceGetBootstrap
                     ErrorAction = 'Stop'
                 }
 
-                # $previousProgressPreference = $ProgressPreference
-                # $ProgressPreference = 'SilentlyContinue'
-
                 Invoke-WebRequest @invokeWebRequestParameters
-
-                # $ProgressPreference = $previousProgressPreference
 
                 $moduleAvailable = $true
             }
             catch
             {
-                #Write-Verbose -Message ($_ | Out-String) -Verbose
-                #Write-Verbose -Message $_.Exception.Message -Verbose
-
                 $exception = New-Exception -ErrorRecord $_ -Message ($script:localizedData.Start_PSResourceGetBootstrap_FailedDownload -f $name)
-                #Write-Verbose -Message $exception -Verbose
                 $errorRecord = New-ErrorRecord -Exception $exception -ErrorId 'SPSRGB0001' -ErrorCategory 'InvalidOperation' -TargetObject $name
+
                 Write-Verbose -Message $errorRecord.Exception -Verbose
-                #$ErrorView = 'DetailedView'
+
                 $PSCmdlet.ThrowTerminatingError($errorRecord)
             }
 
