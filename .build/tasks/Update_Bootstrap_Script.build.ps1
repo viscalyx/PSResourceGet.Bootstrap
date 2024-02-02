@@ -39,13 +39,24 @@ param
 
 # Synopsis: Updates the bootstrap script before deploy
 task Update_Bootstrap_Script {
-    function Get-StartPSResourceGetBootstrapFunctionDefinition
+    function Get-FunctionDefinition
     {
         [CmdletBinding()]
-        param ()
+        param
+        (
+            [Parameter(Mandatory = $true)]
+            [System.String]
+            $CommandName
+
+            # [Parameter(Mandatory = $true)]
+            # [System.String]
+            # $ModuleName
+        )
+
 
         # Get the script content
-        $moduleContent = Get-Content -Path "$BuiltModuleBase/PSResourceGet.Bootstrap.psm1" -Raw
+        #$moduleContent = Get-Content -Path "$BuiltModuleBase/PSResourceGet.Bootstrap.psm1" -Raw
+        $moduleContent = (Get-Command $CommandName).Module.Definition
 
         # Parse the script into an AST
         $ast = [System.Management.Automation.Language.Parser]::ParseInput($moduleContent, [ref]$null, [ref]$null)
@@ -55,7 +66,7 @@ task Update_Bootstrap_Script {
                 param($node)
 
                 return $node -is [System.Management.Automation.Language.FunctionDefinitionAst] -and
-                $node.Name -eq 'Start-PSResourceGetBootstrap'
+                $node.Name -in $CommandName
             }, $true)
 
         return $functionDefinition
@@ -79,7 +90,7 @@ task Update_Bootstrap_Script {
     $builtBootstrapScript = $builtBootstrapScript.Replace('yyyy-MM-dd', (Get-Date -Format 'yyyy-MM-dd'))
 
     Write-Build -Color 'DarkGray' -Text "`tGet the function definition for the Start-PSResourceGetBootstrap function."
-    $functionDefinition = Get-StartPSResourceGetBootstrapFunctionDefinition
+    $functionDefinition = Get-FunctionDefinition -CommandName 'Start-PSResourceGetBootstrap'
 
     Write-Build -Color 'DarkGray' -Text "`t`tGet the parameter block for the Start-PSResourceGetBootstrap function."
     $parameterBlockString = "[CmdletBinding(DefaultParameterSetName = 'Scope')]`n" + $functionDefinition.Body.ParamBlock.Extent.Text
@@ -101,13 +112,35 @@ task Update_Bootstrap_Script {
     $commentBasedHelp = ($functionDefinition.GetHelpContent()).GetCommentBlock()
     $functionDefinitionString = $functionDefinition.Extent.Text
 
-    Write-Build -Color 'DarkGray' -Text "`tAdd the command Get-PSModulePath to the bootstrap script."
-    # TODO: fix the code here
-
     Write-Build -Color 'DarkGray' -Text "`tAdd the command Start-PSResourceGetBootstrap to the bootstrap script."
     $builtBootstrapScript = $builtBootstrapScript.Replace('#placeholder Start-PSResourceGetBootstrap', "$($commentBasedHelp)$($functionDefinitionString)")
 
-    Write-Debug -Message "Updated bootstrap script:`n$builtBootstrapScript"
+    Write-Build -Color 'DarkGray' -Text "`tAdd private helper commands to the bootstrap script."
+
+    $commands = @(
+        'Get-EnvironmentVariable'
+        'Get-PSModulePath'
+        'New-Exception'
+        'New-ErrorRecord'
+    )
+
+    $functionDefinitionString = ''
+
+    foreach ($command in $commands)
+    {
+        Write-Build -Color 'DarkGray' -Text "`t`tGet definition for command $Command."
+
+        $functionDefinition = Get-FunctionDefinition -CommandName $command
+
+        $functionDefinitionString += $functionDefinition.Extent.Text
+        $functionDefinitionString += "`n"
+    }
+
+    Write-Build -Color 'DarkGray' -Text "`tAdding helper commands to the bootstrap script."
+    $builtBootstrapScript = $builtBootstrapScript.Replace('#placeholder helpers', $functionDefinitionString)
+
+    Write-Build -Color 'DarkGray' -Text "`tExport only command Start-PSResourceGetBootstrap from the bootstrap script."
+    $builtBootstrapScript = $builtBootstrapScript.Replace('#placeholder export', "Export-ModuleMember -Function 'Start-PSResourceGetBootstrap'")
 
     Write-Build -Color 'DarkGray' -Text "`tNormalize line endings."
     $builtBootstrapScript = $builtBootstrapScript -replace '\r?\n', "`n"
@@ -115,6 +148,7 @@ task Update_Bootstrap_Script {
     Write-Build -Color 'DarkGray' -Text "`tRemove single line comments (but keep the top version comment)."
     $regex = [System.Text.RegularExpressions.RegEx]::new('^(?!.*\#\>)(?!.*[Vv]ersion) *#.*\r?\n?$', [System.Text.RegularExpressions.RegexOptions]::Multiline)
     $builtBootstrapScript = $regex.Replace($builtBootstrapScript, '')
+
 
     $settings = @{
         IncludeRules = @('PSPlaceOpenBrace', 'PSUseConsistentIndentation', 'PSUseConsistentWhitespace')
@@ -146,6 +180,8 @@ task Update_Bootstrap_Script {
 
     Write-Build -Color 'DarkGray' -Text "`tFormat the bootstrap script."
     $builtBootstrapScript = Invoke-Formatter -ScriptDefinition $builtBootstrapScript -Settings $settings
+
+    Write-Debug -Message "Updated bootstrap script:`n$builtBootstrapScript"
 
     Write-Build -Color 'DarkGray' -Text "`tWrite the bootstrap script to the build output folder."
     Set-Content -Path "$OutputDirectory/bootstrap.ps1" -Value $builtBootstrapScript
