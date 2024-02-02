@@ -52,7 +52,7 @@ Describe 'Bootstrap Script' -Tag 'BootstrapScript' {
     }
 
     Context 'When using Scope parameter set' {
-        It 'Should bootstrap the module to the specified scope' {
+        It 'Should bootstrap the module to the specified scope AllUsers' {
             { & ./output/bootstrap.ps1 -Scope 'AllUsers' -Force -Verbose } | Should -Not -Throw
 
             Get-Module $moduleName -ListAvailable | Where-Object -FilterScript {
@@ -60,7 +60,7 @@ Describe 'Bootstrap Script' -Tag 'BootstrapScript' {
             } | Should -Not -BeNullOrEmpty
         }
 
-        It 'Should bootstrap the module and compatibility to the specified scope' {
+        It 'Should bootstrap the module and compatibility to the specified scope CurrentUser' {
             # Must create the path first, otherwise the test will fail if it does not exist.
             New-Item -Path $currentUserPath -ItemType 'Directory' -Force | Out-Null
 

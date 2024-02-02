@@ -30,8 +30,13 @@ Describe 'Start-PSResourceGetBootstrap' {
     }
 
     Context 'When using Scope parameter set' {
-        It 'Should bootstrap the module to the specified scope' {
+        It 'Should bootstrap the module to the specified scope AllUsers' {
+            $ErrorView = 'DetailedView'
+
             { Start-PSResourceGetBootstrap -Scope 'AllUsers' -Force -Verbose } | Should -Not -Throw
+
+            Write-Verbose -Message ('Error count: {0}' -f $Error.Count) -Verbose
+            Write-Verbose -Message ($Error | Out-String) -Verbose
 
             $allUsersPath = Get-PSModulePath -Scope 'AllUsers'
 
@@ -40,7 +45,7 @@ Describe 'Start-PSResourceGetBootstrap' {
             } | Should -Not -BeNullOrEmpty
         }
 
-        It 'Should bootstrap the module and compatibility to the specified scope' {
+        It 'Should bootstrap the module and compatibility to the specified scope CurrentUser' {
             $currentUserPath = Get-PSModulePath -Scope 'CurrentUser'
 
             # Must create the path first, otherwise the test will fail if it does not exist.
