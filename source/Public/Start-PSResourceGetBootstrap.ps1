@@ -202,13 +202,13 @@ function Start-PSResourceGetBootstrap
             }
             catch
             {
-                Write-Verbose -Message ($_ | Out-String) -Verbose
-                Write-Verbose -Message $_.Exception.Message -Verbose
+                #Write-Verbose -Message ($_ | Out-String) -Verbose
+                #Write-Verbose -Message $_.Exception.Message -Verbose
 
                 $exception = New-Exception -ErrorRecord $_ -Message ($script:localizedData.Start_PSResourceGetBootstrap_FailedDownload -f $name)
                 Write-Verbose -Message $exception -Verbose
                 $errorRecord = New-ErrorRecord -Exception $exception -ErrorId 'SPSRGB0001' -ErrorCategory 'InvalidOperation' -TargetObject $name
-                Write-Verbose -Message $errorRecord -Verbose
+                #Write-Verbose -Message $errorRecord -Verbose
                 $ErrorView = 'DetailedView'
                 $PSCmdlet.ThrowTerminatingError($errorRecord)
             }
