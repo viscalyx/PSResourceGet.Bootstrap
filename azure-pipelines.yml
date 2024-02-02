@@ -316,7 +316,7 @@ stages:
             UBUNTU:
               JOB_VMIMAGE: 'ubuntu-latest'
               PWSH: true
-            UBUNTU:
+            MACOS:
               JOB_VMIMAGE: 'macos-latest'
               PWSH: true
         pool:
@@ -370,7 +370,7 @@ stages:
             UBUNTU:
               JOB_VMIMAGE: 'ubuntu-latest'
               PWSH: true
-            UBUNTU:
+            MACOS:
               JOB_VMIMAGE: 'macos-latest'
               PWSH: true
         pool:
