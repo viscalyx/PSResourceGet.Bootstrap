@@ -56,6 +56,7 @@ Describe 'Bootstrap Script' -Tag 'BootstrapScript' {
             {
                 if ($IsLinux)
                 {
+                    # TODO: This works but does not output the verbose messages.
                     sudo pwsh -Command "& $PwD/output/bootstrap.ps1 -Scope 'AllUsers' -Force -Verbose"
                 }
                 else

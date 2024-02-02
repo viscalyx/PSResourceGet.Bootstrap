@@ -32,6 +32,7 @@ Describe 'Start-PSResourceGetBootstrap' {
     Context 'When using Scope parameter set' {
         <#
             TODO: The test is skipped on Linux, it fails maybe because pwsh needs to run as sudo.
+                  the test is run using sudo in Bootstrap.Integration.Tests.ps1 and seems to work.
 
             Fails with:
             System.Exception: Failed to download 'Microsoft.PowerShell.PSResourceGet' from the PowerShell Gallery.
