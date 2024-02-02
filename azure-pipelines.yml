@@ -301,10 +301,24 @@ stages:
         displayName: 'Integration'
         strategy:
           matrix:
-            SQL2016_WIN2019:
+            WIN2019_PWSH:
               JOB_VMIMAGE: 'windows-2019'
-            SQL2016_WIN2022:
+              PWSH: true
+            WIN2019:
+              JOB_VMIMAGE: 'windows-2019'
+              PWSH: false
+            WIN2022_PWSH:
               JOB_VMIMAGE: 'windows-2022'
+              PWSH: true
+            WIN2022:
+              JOB_VMIMAGE: 'windows-2022'
+              PWSH: false
+            UBUNTU:
+              JOB_VMIMAGE: 'ubuntu-latest'
+              PWSH: true
+            UBUNTU:
+              JOB_VMIMAGE: 'macos-latest'
+              PWSH: true
         pool:
           vmImage: $(JOB_VMIMAGE)
         timeoutInMinutes: 0
@@ -322,26 +336,43 @@ stages:
               targetType: 'inline'
               script: 'winrm quickconfig -quiet'
               pwsh: false
-          - powershell: |
-              ./build.ps1 -Tasks test -CodeCoverageThreshold 0 -PesterPath 'tests/Integration' -PesterExcludeTag 'BootstrapScript'
+          - task: PowerShell@2
             name: test
             displayName: 'Run Integration Test'
+            inputs:
+              filePath: './build.ps1'
+              arguments: "-Tasks test -CodeCoverageThreshold 0 -PesterPath 'tests/Integration' -PesterExcludeTag 'BootstrapScript'"
+              pwsh: $(PWSH)
           - task: PublishTestResults@2
             displayName: 'Publish Test Results'
             condition: succeededOrFailed()
             inputs:
               testResultsFormat: 'NUnit'
               testResultsFiles: '$(buildFolderName)/$(testResultFolderName)/NUnit*.xml'
-              testRunTitle: 'Integration ($(JOB_VMIMAGE))'
+              testRunTitle: 'Integration ($(Agent.JobName))'
 
       - job: Test_Integration_Bootstrap_Script
         displayName: 'Integration Bootstrap Script'
         strategy:
           matrix:
-            SQL2016_WIN2019:
+            WIN2019_PWSH:
               JOB_VMIMAGE: 'windows-2019'
-            SQL2016_WIN2022:
+              PWSH: true
+            WIN2019:
+              JOB_VMIMAGE: 'windows-2019'
+              PWSH: false
+            WIN2022_PWSH:
               JOB_VMIMAGE: 'windows-2022'
+              PWSH: true
+            WIN2022:
+              JOB_VMIMAGE: 'windows-2022'
+              PWSH: false
+            UBUNTU:
+              JOB_VMIMAGE: 'ubuntu-latest'
+              PWSH: true
+            UBUNTU:
+              JOB_VMIMAGE: 'macos-latest'
+              PWSH: true
         pool:
           vmImage: $(JOB_VMIMAGE)
         timeoutInMinutes: 0
@@ -352,17 +383,20 @@ stages:
               buildType: 'current'
               artifactName: $(buildArtifactName)
               targetPath: '$(Build.SourcesDirectory)/$(buildFolderName)'
-          - powershell: |
-              ./build.ps1 -Tasks test -CodeCoverageThreshold 0 -PesterPath 'tests/Integration' -PesterTag 'BootstrapScript'
+          - task: PowerShell@2
             name: test
             displayName: 'Run Integration Test'
+            inputs:
+              filePath: './build.ps1'
+              arguments: "-Tasks test -CodeCoverageThreshold 0 -PesterPath 'tests/Integration' -PesterTag 'BootstrapScript'"
+              pwsh: $(PWSH)
           - task: PublishTestResults@2
             displayName: 'Publish Test Results'
             condition: succeededOrFailed()
             inputs:
               testResultsFormat: 'NUnit'
               testResultsFiles: '$(buildFolderName)/$(testResultFolderName)/NUnit*.xml'
-              testRunTitle: 'Integration Bootstrap Script ($(JOB_VMIMAGE))'
+              testRunTitle: 'Integration Bootstrap Script ($(Agent.JobName))'
 
   - stage: Deploy
     dependsOn: Test
