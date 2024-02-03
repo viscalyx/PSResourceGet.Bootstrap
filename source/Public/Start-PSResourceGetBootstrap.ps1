@@ -71,6 +71,7 @@ function Start-PSResourceGetBootstrap
     (
         [Parameter(Mandatory = $true, ParameterSetName = 'Destination')]
         [ValidateScript({
+            Write-Verbose -Message "Destination folder is set to '$($_)'."
             Test-Path -Path $_ -PathType 'Container'
         })]
         [System.String]
