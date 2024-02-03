@@ -515,7 +515,7 @@ begin
 
         Write-Verbose -Message "Calling .\Resolve-Dependency.ps1 with parameters: $($resolveDependencyParams | Out-String)" -Verbose
 
-        .\Resolve-Dependency.ps1 @resolveDependencyParams
+        .\Resolve-Dependency.ps1 @resolveDependencyParams -Verbose
     }
 
     if ($MyInvocation.ScriptName -notlike '*Invoke-Build.ps1')
