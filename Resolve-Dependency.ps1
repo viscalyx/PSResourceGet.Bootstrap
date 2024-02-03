@@ -955,6 +955,14 @@ try
 
                 Write-Progress -Activity 'PSResourceGet:' -PercentComplete $progressPercent -CurrentOperation 'Restoring Build Dependencies'
 
+                Write-Verbose -Message ((Get-Command ForEach-Object).Parameters.Keys | Out-String) -Verbose
+                Write-Verbose -Message (get-Help ForEach-Object | Out-String) -Verbose
+
+                if (-not $PSResourceGetThrottleLimit)
+                {
+                    $PSResourceGetThrottleLimit = 1
+                }
+
                 $modulesToSave | ForEach-Object -ThrottleLimit $PSResourceGetThrottleLimit -Parallel {
                     $currentModule = $_
 
