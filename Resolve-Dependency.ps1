@@ -154,8 +154,6 @@ param
     $UsePowerShellGetCompatibilityModuleVersion
 )
 
-Write-Verbose -Message ("BoundParameters: $($PSBoundParameters | Out-String)") -Verbose
-
 try
 {
     if ($PSVersionTable.PSVersion.Major -le 5)
@@ -947,6 +945,7 @@ try
 
                 $percentagePerModule = [System.Math]::Floor(100 / $modulesToSave.Length)
 
+                # TODO: This is not necessary unless -Parallell can be used (which isn't the case in older PowerShell versions).
                 # Inspired from https://stackoverflow.com/questions/67114770/are-non-concurrent-collections-safe-inside-concurrent-collections
                 $syncProgress  = [System.Collections.Concurrent.ConcurrentDictionary[string, int]]::new()
 
@@ -955,10 +954,8 @@ try
 
                 Write-Progress -Activity 'PSResourceGet:' -PercentComplete $progressPercent -CurrentOperation 'Restoring Build Dependencies'
 
-                Write-Verbose -Message ((Get-Command ForEach-Object).Parameters.Keys | Out-String) -Verbose
-                Write-Verbose -Message (get-Help ForEach-Object | Out-String) -Verbose
-
                 # This scriptblock is used by ForEach-Object below.
+                # TODO: The scriptblock cannot use the $using: scope to access variables when passes to parameter -Process
                 $forEachObjectScriptBlock = {
                     $currentModule = $_
 
