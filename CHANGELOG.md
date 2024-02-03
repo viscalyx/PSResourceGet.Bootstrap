@@ -5,6 +5,16 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+### Fixed
+
+- Reverted resolve dependency logic so that GitHub actions works.
+
+## [0.1.2] - 2024-02-03
+
+### Fixed
+
+- Fix bootstrap script parameter block.
+
 ## [0.1.1] - 2024-02-02
 
 ### Fixed
@@ -12,7 +22,6 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - Status badges updated.
 - Update integration tests for the bootstrap script.
 - Fix missing commands in bootstrap script.
-- Fix bootstrap script parameter block.
 
 ### Changed
 
