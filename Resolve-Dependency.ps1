@@ -154,6 +154,8 @@ param
     $UsePowerShellGetCompatibilityModuleVersion
 )
 
+Write-Verbose -Message ("BoundParameters: $($PSBoundParameters | Out-String)") -Verbose
+
 try
 {
     if ($PSVersionTable.PSVersion.Major -le 5)

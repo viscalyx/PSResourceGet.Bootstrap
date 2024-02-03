@@ -513,6 +513,8 @@ begin
 
         Write-Host -Object "[pre-build] Starting bootstrap process." -ForegroundColor Green
 
+        Write-Verbose -Message "Calling .\Resolve-Dependency.ps1 with parameters: $($resolveDependencyParams | Out-String)" -Verbose
+
         .\Resolve-Dependency.ps1 @resolveDependencyParams
     }
 
