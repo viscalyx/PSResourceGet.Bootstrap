@@ -40,12 +40,7 @@ Describe 'Start-PSResourceGetBootstrap' {
             ---> System.IO.IOException: Permission denied
         #>
         It 'Should bootstrap the module to the specified scope AllUsers' -Skip:$IsLinux {
-            $ErrorView = 'DetailedView'
-
             { Start-PSResourceGetBootstrap -Scope 'AllUsers' -Force -Verbose } | Should -Not -Throw
-
-            Write-Verbose -Message ('Error count: {0}' -f $Error.Count) -Verbose
-            Write-Verbose -Message ($Error | Out-String) -Verbose
 
             $allUsersPath = Get-PSModulePath -Scope 'AllUsers'
 

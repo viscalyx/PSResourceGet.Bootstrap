@@ -86,6 +86,38 @@ Describe 'Bootstrap Script' -Tag 'BootstrapScript' {
         }
     }
 
+    Context 'When using Invoke-Expression to initiate the bootstrap script (with defaults)' {
+        BeforeAll {
+            Remove-Item -Path "$currentUserPath/$moduleName" -Recurse -Force -ErrorAction 'SilentlyContinue'
+        }
+
+        It 'Should have removed the downloaded module in previous tests' {
+            Get-Module $moduleName -ListAvailable | Where-Object -FilterScript {
+                $_.Path -match [System.Text.RegularExpressions.Regex]::Escape($currentUserPath)
+            } | Should -BeNullOrEmpty
+        }
+
+        It 'Should bootstrap the module to the default scope CurrentUser' {
+            # Must create the path first, otherwise the test will fail if it does not exist.
+            New-Item -Path $currentUserPath -ItemType 'Directory' -Force | Out-Null
+
+            $script = Get-Content -Path './output/bootstrap.ps1' -Raw
+
+            # Set default parameters for the command that the script runs.
+            $PSDefaultParameterValues['Start-PSResourceGetBootstrap:Force'] = $true
+            $PSDefaultParameterValues['Start-PSResourceGetBootstrap:Verbose'] = $true
+
+            { $script | Invoke-Expression } | Should -Not -Throw
+
+            $PSDefaultParameterValues.Remove('Start-PSResourceGetBootstrap:Force')
+            $PSDefaultParameterValues.Remove('Start-PSResourceGetBootstrap:Verbose')
+
+            Get-Module $moduleName -ListAvailable | Where-Object -FilterScript {
+                $_.Path -match [System.Text.RegularExpressions.Regex]::Escape($currentUserPath)
+            } | Should -Not -BeNullOrEmpty
+        }
+    }
+
     Context 'When using Destination parameter set' {
         BeforeAll {
             $testFolder1 = "$TestDrive/Test1"

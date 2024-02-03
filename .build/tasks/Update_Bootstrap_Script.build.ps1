@@ -39,31 +39,106 @@ param
 
 # Synopsis: Updates the bootstrap script before deploy
 task Update_Bootstrap_Script {
-    function Get-FunctionDefinition
+    function Get-FunctionDefinitionAst
     {
         [CmdletBinding()]
         param
         (
             [Parameter(Mandatory = $true)]
             [System.String]
-            $CommandName
+            $CommandName,
+
+            [Parameter()]
+            [System.String]
+            $ModuleContent
         )
 
-        # Get the script content
-        $moduleContent = (Get-Command $CommandName).Module.Definition
+        if (-not $PSBoundParameters.ContainsKey('ModuleContent'))
+        {
+            # Get the command script definition.
+            $moduleContent = (Get-Command $CommandName).Module.Definition
+        }
 
-        # Parse the script into an AST
-        $ast = [System.Management.Automation.Language.Parser]::ParseInput($moduleContent, [ref]$null, [ref]$null)
+        # Parse the script into an AST.
+        $ast = [System.Management.Automation.Language.Parser]::ParseInput($ModuleContent, [ref] $null, [ref] $null)
 
-        # Find the Start-PSResourceGetBootstrap function definition
-        $functionDefinition = $ast.Find({
-                param($node)
+        $astFilter = {
+            $args[0] -is [System.Management.Automation.Language.FunctionDefinitionAst] -and
+            $args[0].Name -eq $CommandName
+        }
 
-                return $node -is [System.Management.Automation.Language.FunctionDefinitionAst] -and
-                $node.Name -in $CommandName
-            }, $true)
+        $functionDefinition = $ast.Find($astFilter, $true)
 
         return $functionDefinition
+    }
+
+    function Get-ParameterAst
+    {
+        [CmdletBinding()]
+        param
+        (
+            [Parameter(Mandatory = $true)]
+            [System.Management.Automation.Language.ParamBlockAst]
+            $Ast,
+
+            [Parameter(Mandatory = $true)]
+            [System.String]
+            $ParameterName
+        )
+
+        $astFilter = {
+            $args[0] -is [System.Management.Automation.Language.ParameterAst] `
+            -and $args[0].Name.Extent.Text -eq $ParameterName
+        }
+
+        $parameterAst = $Ast.Find($astFilter, $false)
+
+        return $parameterAst
+    }
+
+    function Get-ParameterValidationAst
+    {
+        [CmdletBinding()]
+        param
+        (
+            [Parameter(Mandatory = $true)]
+            [System.Management.Automation.Language.ParameterAst]
+            $Ast
+        )
+
+        $astFilter = {
+            $args[0] -is [System.Management.Automation.Language.AttributeAst] `
+                -and $args[0].TypeName.Name -match 'Validate'
+        }
+
+        $validateAttributeAst = $Ast.Find($astFilter, $false)
+
+        return $validateAttributeAst
+    }
+
+    function Remove-AstExtentContent
+    {
+        [CmdletBinding()]
+        param
+        (
+            [Parameter(Mandatory = $true)]
+            [System.Management.Automation.Language.Ast]
+            $Ast,
+
+            [Parameter(Mandatory = $true)]
+            [System.String]
+            $Script
+        )
+
+        $startOffset = $Ast.Extent.StartOffset
+        $endOffset = $Ast.Extent.EndOffset
+
+        Write-Debug -Message "Start offset: $startOffset, End offset: $endOffset"
+
+        $beforeAst = $Script.Substring(0, $startOffset)
+        $afterAst = $Script.Substring($endOffset)
+
+        return $beforeAst + $afterAst
     }
 
     # Get the vales for task variables, see https://github.com/gaelcolas/Sampler#task-variables.
@@ -83,10 +158,37 @@ task Update_Bootstrap_Script {
     $builtBootstrapScript = $builtBootstrapScript.Replace('v#.#.#', $ModuleVersion)
     $builtBootstrapScript = $builtBootstrapScript.Replace('yyyy-MM-dd', (Get-Date -Format 'yyyy-MM-dd'))
 
-    Write-Build -Color 'DarkGray' -Text "`tGet the function definition for the Start-PSResourceGetBootstrap function."
-    $functionDefinition = Get-FunctionDefinition -CommandName 'Start-PSResourceGetBootstrap'
+    Write-Build -Color 'DarkGray' -Text "`tParse the parameter block of the Start-PSResourceGetBootstrap command in the built module."
 
-    Write-Build -Color 'DarkGray' -Text "`t`tGet the parameter block for the Start-PSResourceGetBootstrap function."
+    # Get the function definition of the command Start-PSResourceGetBootstrap command in the built module.
+    $functionDefinition = Get-FunctionDefinitionAst -CommandName 'Start-PSResourceGetBootstrap'
+
+    # Need to parse the entire module content to get the correct parameter block.
+    $moduleContent = $functionDefinition.Parent.Parent.Extent.Text
+
+    # Get the parameters for the Start-PSResourceGetBootstrap command.
+    $parameters = $functionDefinition.Body.ParamBlock.Parameters.Name
+
+    foreach ($parameter in $parameters)
+    {
+        Write-Build -Color 'DarkGray' -Text "`t`tGet the validation attributes for parameter $parameter."
+        $parameterAst = Get-ParameterAst -Ast $functionDefinition.Body.ParamBlock -ParameterName $parameter
+        $validationAttributeAst = Get-ParameterValidationAst -Ast $parameterAst
+
+        if ($validationAttributeAst -and $validationAttributeAst.TypeName.Name -eq 'ValidateScript')
+        {
+            Write-Build -Color 'DarkGray' -Text "`t`t`tRemove the validation script for parameter $parameter."
+            $moduleContent = Remove-AstExtentContent -Ast $validationAttributeAst -Script $moduleContent
+
+            # Parse the $moduleContent result to AST to get the correct parameter block, to continue parsing parameters.
+            $functionDefinition = Get-FunctionDefinitionAst -CommandName 'Start-PSResourceGetBootstrap' -ModuleContent $moduleContent
+        }
+    }
+
+    # Parse the $moduleContent result to AST to get the correct parameter block.
+    $functionDefinition = Get-FunctionDefinitionAst -CommandName 'Start-PSResourceGetBootstrap' -ModuleContent $moduleContent
+
+    Write-Build -Color 'DarkGray' -Text "`tWrite the parameter block of the bootstrap script."
     $parameterBlockString = "[CmdletBinding(DefaultParameterSetName = 'Scope')]`n" + $functionDefinition.Body.ParamBlock.Extent.Text
 
     Write-Build -Color 'DarkGray' -Text "`tSet parameters in the bootstrap script"
@@ -101,6 +203,9 @@ task Update_Bootstrap_Script {
 
     Write-Build -Color 'DarkGray' -Text "`tSet localization in the bootstrap script."
     $builtBootstrapScript = $builtBootstrapScript.Replace('#placeholder localization', "`$script:localizedData = `n$localizationContent")
+
+    Write-Build -Color 'DarkGray' -Text "`tGet the function definition of the Start-PSResourceGetBootstrap command in the built module."
+    $functionDefinition = Get-FunctionDefinitionAst -CommandName 'Start-PSResourceGetBootstrap'
 
     Write-Build -Color 'DarkGray' -Text "`tGet the comment-based help for the Start-PSResourceGetBootstrap function."
     $commentBasedHelp = ($functionDefinition.GetHelpContent()).GetCommentBlock()
@@ -124,7 +229,7 @@ task Update_Bootstrap_Script {
     {
         Write-Build -Color 'DarkGray' -Text "`t`tGet definition for command $Command."
 
-        $functionDefinition = Get-FunctionDefinition -CommandName $command
+        $functionDefinition = Get-FunctionDefinitionAst -CommandName $command
 
         $functionDefinitionString += $functionDefinition.Extent.Text
         $functionDefinitionString += "`n"

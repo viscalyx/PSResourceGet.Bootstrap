@@ -12,6 +12,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - Status badges updated.
 - Update integration tests for the bootstrap script.
 - Fix missing commands in bootstrap script.
+- Fix bootstrap script parameter block.
 
 ### Changed
 
