@@ -7,7 +7,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ### Fixed
 
-- GitHub actions are now working.
+- Reverted resolve dependency logic so that GitHub actions works.
 
 ## [0.1.2] - 2024-02-03
 
