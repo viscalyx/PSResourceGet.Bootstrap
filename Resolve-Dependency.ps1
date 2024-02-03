@@ -1033,6 +1033,10 @@ try
 
     Write-Progress -Activity 'Bootstrap:' -PercentComplete 100 -CurrentOperation 'Bootstrap complete' -Completed
 }
+catch
+{
+    throw $_
+}
 finally
 {
     if ($RegisterGallery)
