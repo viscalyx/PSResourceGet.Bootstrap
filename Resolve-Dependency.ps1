@@ -958,12 +958,8 @@ try
                 Write-Verbose -Message ((Get-Command ForEach-Object).Parameters.Keys | Out-String) -Verbose
                 Write-Verbose -Message (get-Help ForEach-Object | Out-String) -Verbose
 
-                if (-not $PSResourceGetThrottleLimit)
-                {
-                    $PSResourceGetThrottleLimit = 1
-                }
-
-                $modulesToSave | ForEach-Object -ThrottleLimit $PSResourceGetThrottleLimit -Parallel {
+                # This scriptblock is used by ForEach-Object below.
+                $forEachObjectScriptBlock = {
                     $currentModule = $_
 
                     $savePSResourceParameters = @{
@@ -1012,6 +1008,20 @@ try
                     {
                         Write-Progress -Activity 'PSResourceGet:' -PercentComplete $progressPercent -CurrentOperation 'Restoring Build Dependencies' -Status ('Saved module {0}' -f $savePSResourceParameters.Name)
                     }
+                }
+
+                if ($IsCoreCLR)
+                {
+                    if (-not $PSResourceGetThrottleLimit)
+                    {
+                        $PSResourceGetThrottleLimit = 1
+                    }
+
+                    $modulesToSave | ForEach-Object -ThrottleLimit $PSResourceGetThrottleLimit -Parallel $forEachObjectScriptBlock
+                }
+                else
+                {
+                    $modulesToSave | ForEach-Object -Process $forEachObjectScriptBlock
                 }
 
                 Write-Progress -Activity 'PSResourceGet:' -PercentComplete 100 -CurrentOperation 'Restoring Build Dependencies' -Completed
