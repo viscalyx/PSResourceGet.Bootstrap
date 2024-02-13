@@ -33,7 +33,7 @@ Configuration DSC_BootstrapPSResourceGet_CurrentUser_Config
 
     node $AllNodes.NodeName
     {
-        PSResourceGetBootstrap 'Integration_Test'
+        BootstrapPSResourceGet 'Integration_Test'
         {
             IsSingleInstance = 'Yes'
             Scope            = 'CurrentUser'
