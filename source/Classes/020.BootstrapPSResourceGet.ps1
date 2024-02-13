@@ -66,14 +66,14 @@
 [DscResource(RunAsCredential = 'Optional')]
 class BootstrapPSResourceGet : ResourceBase
 {
-    [DscProperty(Key)]
-    [SingleInstance]
-    $IsSingleInstance
-
     # [DscProperty(Key)]
-    # [ValidateSet('Yes')]
-    # [System.String]
+    # [SingleInstance]
     # $IsSingleInstance
+
+    [DscProperty(Key)]
+    [ValidateSet('Yes')]
+    [System.String]
+    $IsSingleInstance
 
     # The Destination is evaluated if exist in AssertProperties().
     [DscProperty()]
