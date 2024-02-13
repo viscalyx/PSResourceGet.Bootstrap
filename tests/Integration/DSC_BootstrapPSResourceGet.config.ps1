@@ -36,7 +36,7 @@ Configuration DSC_BootstrapPSResourceGet_CurrentUser_Config
         BootstrapPSResourceGet 'Integration_Test'
         {
             IsSingleInstance = 'Yes'
-            Scope            = 'CurrentUser'
+            ModuleScope      = 'CurrentUser'
         }
     }
 }

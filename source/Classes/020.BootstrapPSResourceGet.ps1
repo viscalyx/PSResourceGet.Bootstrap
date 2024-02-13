@@ -9,8 +9,9 @@
 
         It supports two parameter sets: 'Destination' and 'Scope'. The 'Destination'
         parameter set allows you to specify a specific location to save the module,
-        while the 'Scope' parameter set saves the module to the appropriate `$env:PSModulePath`
-        location based on the specified scope ('CurrentUser' or 'AllUsers').
+        while the 'ModuleScope' parameter set saves the module to the appropriate
+        `$env:PSModulePath` location based on the specified scope ('CurrentUser'
+        or 'AllUsers').
 
         The built-in parameter **PSDscRunAsCredential** can be used to run the resource
         as another user.
@@ -40,11 +41,12 @@
     .PARAMETER Destination
         Specifies the destination path where the module should be saved. This parameter
         is mandatory when using the 'Destination' parameter set. The path must be a valid
-        container. This parameter may not be used at the same time as the parameter Scope.
+        container. This parameter may not be used at the same time as the parameter
+        `ModuleScope`.
 
-    .PARAMETER Scope
+    .PARAMETER ModuleScope
         Specifies the scope for saving the module. This parameter is used when using the
-        'Scope' parameter set. The valid values are 'CurrentUser' and 'AllUsers'. The
+        'ModuleScope' parameter set. The valid values are 'CurrentUser' and 'AllUsers'. The
         default value is 'CurrentUser'. This parameter may not be used at the same time
         as the parameter Destination.
 
@@ -55,7 +57,7 @@
     .EXAMPLE
         Invoke-DscResource -ModuleName PSResourceGet.Bootstrap -Name BootstrapPSResourceGet -Method Get -Property @{
             IsSingleInstance = 'Yes'
-            Scope            = 'CurrentUser'
+            ModuleScope      = 'CurrentUser'
         }
 
         This example shows how to call the resource using Invoke-DscResource. This
@@ -80,11 +82,11 @@ class BootstrapPSResourceGet : ResourceBase
     [System.String]
     $Destination
 
-    # The Scope is evaluated if exist in AssertProperties().
+    # The ModuleScope is evaluated if exist in AssertProperties().
     [DscProperty()]
     [ValidateSet('CurrentUser', 'AllUsers')]
     [System.String]
-    $Scope
+    $ModuleScope
 
     # The Version is evaluated if exist in AssertProperties().
     [DscProperty()]
@@ -144,20 +146,20 @@ class BootstrapPSResourceGet : ResourceBase
             $currentState.Version = ''
         }
 
-        # If it is scope wasn't specified, then destination was specified.
-        if ($assignedDscProperties.Keys -contains 'Scope')
+        # If it is ModuleScope wasn't specified, then destination was specified.
+        if ($assignedDscProperties.Keys -contains 'ModuleScope')
         {
             Write-Verbose -Message (
-                $this.localizedData.EvaluatingScope -f $assignedDscProperties.Scope
+                $this.localizedData.EvaluatingScope -f $assignedDscProperties.ModuleScope
             )
 
-            $currentState.Scope = ''
+            $currentState.ModuleScope = ''
 
-            $testModuleExistParameters.Scope = $assignedDscProperties.Scope
+            $testModuleExistParameters.ModuleScope = $assignedDscProperties.ModuleScope
 
             if ((Test-ModuleExist @testModuleExistParameters -ErrorAction 'Stop'))
             {
-                $currentState.Scope = $assignedDscProperties.Scope
+                $currentState.ModuleScope = $assignedDscProperties.ModuleScope
 
                 if ($assignedDscProperties.Keys -contains 'Version')
                 {
@@ -210,11 +212,11 @@ class BootstrapPSResourceGet : ResourceBase
     #>
     hidden [void] AssertProperties([System.Collections.Hashtable] $property)
     {
-        # The properties Scope and Destination are mutually exclusive.
+        # The properties ModuleScope and Destination are mutually exclusive.
         $assertBoundParameterParameters = @{
             BoundParameterList     = $property
             MutuallyExclusiveList1 = @(
-                'Scope'
+                'ModuleScope'
             )
             MutuallyExclusiveList2 = @(
                 'Destination'
@@ -223,15 +225,15 @@ class BootstrapPSResourceGet : ResourceBase
 
         Assert-BoundParameter @assertBoundParameterParameters
 
-        if ($property.Keys -contains 'Scope')
+        if ($property.Keys -contains 'ModuleScope')
         {
-            $scopeModulePath = Get-PSModulePath -Scope $property.Scope
+            $scopeModulePath = Get-PSModulePath -Scope $property.ModuleScope
 
             if (-not (Test-Path -Path $scopeModulePath))
             {
-                $errorMessage = $this.localizedData.ScopePathInvalid -f $property.Scope, $scopeModulePath
+                $errorMessage = $this.localizedData.ScopePathInvalid -f $property.ModuleScope, $scopeModulePath
 
-                New-InvalidArgumentException -ArgumentName 'Scope' -Message $errorMessage
+                New-InvalidArgumentException -ArgumentName 'ModuleScope' -Message $errorMessage
             }
         }
 
