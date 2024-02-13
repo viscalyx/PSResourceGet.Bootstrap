@@ -84,7 +84,7 @@ class BootstrapPSResourceGet : ResourceBase
     [DscProperty()]
     [ValidateSet('CurrentUser', 'AllUsers')]
     [System.String]
-    $Scope
+    $ModuleScope
 
     # The Version is evaluated if exist in AssertProperties().
     [DscProperty()]
