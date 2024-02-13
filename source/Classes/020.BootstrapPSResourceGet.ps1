@@ -84,14 +84,14 @@ class BootstrapPSResourceGet : ResourceBase
     [DscProperty()]
     [ValidateSet('CurrentUser', 'AllUsers')]
     [System.String]
-    $ModuleScope
+    $Scope
 
     # The Version is evaluated if exist in AssertProperties().
     [DscProperty()]
     [System.String]
     $Version
 
-    BootstrapPSResourceGet () : base ()
+    BootstrapPSResourceGet () : base ($PSScriptRoot)
     {
         # These properties will not be enforced.
         $this.ExcludeDscProperties = @(

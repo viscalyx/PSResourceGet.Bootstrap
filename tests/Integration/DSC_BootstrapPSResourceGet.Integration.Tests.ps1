@@ -102,7 +102,7 @@ Describe "$($script:dscResourceName)_Integration" -Tag @('DSC') {
             }
 
             #$resourceCurrentState.IsSingleInstance | Should -Be 'Yes'
-            $resourceCurrentState.ModuleScope | Should -Be 'CurrentUser'
+            $resourceCurrentState.Scope | Should -Be 'CurrentUser'
         }
 
         It 'Should return ''True'' when Test-DscConfiguration is run' {
