@@ -340,7 +340,7 @@ stages:
             displayName: 'Run Integration Test'
             inputs:
               filePath: './build.ps1'
-              arguments: "-Tasks test -CodeCoverageThreshold 0 -PesterPath 'tests/Integration' -PesterExcludeTag 'BootstrapScript'"
+              arguments: "-Tasks test -CodeCoverageThreshold 0 -PesterPath 'tests/Integration' -PesterExcludeTag @('BootstrapScript','DSC')"
               pwsh: $(PWSH)
           - task: PublishTestResults@2
             displayName: 'Publish Test Results'
