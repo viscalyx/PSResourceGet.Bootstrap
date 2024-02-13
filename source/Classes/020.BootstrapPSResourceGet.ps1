@@ -82,7 +82,12 @@ class BootstrapPSResourceGet : ResourceBase
     [System.String]
     $Destination
 
-    # The ModuleScope is evaluated if exist in AssertProperties().
+    <#
+        The ModuleScope is evaluated if exist in AssertProperties().
+
+        The name Scope could not be used as it is a reserved keyword in
+        PowerShell DSC, if used it throws an error when parsing a configuration.
+    #>
     [DscProperty()]
     [ValidateSet('CurrentUser', 'AllUsers')]
     [System.String]
@@ -155,7 +160,7 @@ class BootstrapPSResourceGet : ResourceBase
 
             $currentState.ModuleScope = ''
 
-            $testModuleExistParameters.ModuleScope = $assignedDscProperties.ModuleScope
+            $testModuleExistParameters.Scope = $assignedDscProperties.ModuleScope
 
             if ((Test-ModuleExist @testModuleExistParameters -ErrorAction 'Stop'))
             {
@@ -175,7 +180,7 @@ class BootstrapPSResourceGet : ResourceBase
 
             $currentState.Destination = ''
 
-            $testModuleExistParameters.Destination = $assignedDscProperties.Destination
+            $testModuleExistParameters.Path = $assignedDscProperties.Destination
 
             if ((Test-ModuleExist @testModuleExistParameters -ErrorAction 'Stop'))
             {
