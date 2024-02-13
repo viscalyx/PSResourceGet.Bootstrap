@@ -350,6 +350,48 @@ stages:
               testResultsFiles: '$(buildFolderName)/$(testResultFolderName)/NUnit*.xml'
               testRunTitle: 'Integration ($(Agent.JobName))'
 
+      - job: Test_Integration_DSC
+        displayName: 'Integration DSC'
+        strategy:
+          matrix:
+            WIN2019:
+              JOB_VMIMAGE: 'windows-2019'
+              PWSH: false
+            WIN2022:
+              JOB_VMIMAGE: 'windows-2022'
+              PWSH: false
+        pool:
+          vmImage: $(JOB_VMIMAGE)
+        timeoutInMinutes: 0
+        steps:
+          - task: DownloadPipelineArtifact@2
+            displayName: 'Download Build Artifact'
+            inputs:
+              buildType: 'current'
+              artifactName: $(buildArtifactName)
+              targetPath: '$(Build.SourcesDirectory)/$(buildFolderName)'
+          - task: PowerShell@2
+            name: configureWinRM
+            displayName: 'Configure WinRM'
+            inputs:
+              targetType: 'inline'
+              script: 'winrm quickconfig -quiet'
+              pwsh: false
+          - task: PowerShell@2
+            name: test
+            displayName: 'Run Integration Test'
+            inputs:
+              filePath: './build.ps1'
+              arguments: "-Tasks test -CodeCoverageThreshold 0 -PesterPath 'tests/Integration' -PesterTag 'DSC'"
+              pwsh: $(PWSH)
+          - task: PublishTestResults@2
+            displayName: 'Publish Test Results'
+            condition: succeededOrFailed()
+            inputs:
+              testResultsFormat: 'NUnit'
+              testResultsFiles: '$(buildFolderName)/$(testResultFolderName)/NUnit*.xml'
+              testRunTitle: 'Integration ($(Agent.JobName))'
+
       - job: Test_Integration_Bootstrap_Script
         displayName: 'Integration Bootstrap Script'
         dependsOn:
