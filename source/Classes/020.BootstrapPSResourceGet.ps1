@@ -33,6 +33,10 @@
         together with class-based resources that using advanced type like the parameter
         **Reasons** have.
 
+    .PARAMETER IsSingleInstance
+        Specifies that only a single instance of the resource can exist in one and
+        the same configuration. Must always be set to the value `Yes`.
+
     .PARAMETER Destination
         Specifies the destination path where the module should be saved. This parameter
         is mandatory when using the 'Destination' parameter set. The path must be a valid
@@ -47,27 +51,6 @@
     .PARAMETER Version
         Specifies the version of the Microsoft.PowerShell.PSResourceGet module to download.
         If not specified, the latest version will be downloaded.
-
-    .PARAMETER UseCompatibilityModule
-        Indicates whether to use the compatibility module. If this switch parameter is
-        present, the compatibility module will be downloaded.
-
-    .PARAMETER CompatibilityModuleVersion
-        Specifies the version of the compatibility module to download. If not specified,
-        it will default to a minimum required range that includes previews.
-
-    .PARAMETER Force
-        Forces the operation without prompting for confirmation. This is useful when
-        running the script in non-interactive mode.
-
-    .PARAMETER ImportModule
-        Indicates whether to import the module after it has been downloaded.
-
-    .PARAMETER Ensure
-        Specifies if the server audit should be present or absent. If set to `Present`
-        the audit will be added if it does not exist, or updated if the audit exist.
-        If `Absent` then the audit will be removed from the server. Defaults to
-        `Present`.
 
     .EXAMPLE
         Invoke-DscResource -ModuleName PSResourceGet.Bootstrap -Name BootstrapPSResourceGet -Method Get -Property @{
@@ -84,9 +67,13 @@
 class BootstrapPSResourceGet : ResourceBase
 {
     [DscProperty(Key)]
-    [ValidateSet('Yes')]
-    [System.String]
+    [SingleInstance]
     $IsSingleInstance
+
+    # [DscProperty(Key)]
+    # [ValidateSet('Yes')]
+    # [System.String]
+    # $IsSingleInstance
 
     # The Destination is evaluated if exist in AssertProperties().
     [DscProperty()]
@@ -103,23 +90,6 @@ class BootstrapPSResourceGet : ResourceBase
     [DscProperty()]
     [System.String]
     $Version
-
-    # [DscProperty()]
-    # [Nullable[System.Boolean]]
-    # $UseCompatibilityModule
-
-    # # The CompatibilityModuleVersion is evaluated if exist in AssertProperties().
-    # [DscProperty()]
-    # [System.String]
-    # $CompatibilityModuleVersion
-
-    # [DscProperty()]
-    # [Nullable[System.Boolean]]
-    # $ImportModule
-
-    # [DscProperty()]
-    # [Ensure]
-    # $Ensure = [Ensure]::Present
 
     BootstrapPSResourceGet () : base ()
     {
@@ -227,6 +197,10 @@ class BootstrapPSResourceGet : ResourceBase
     #>
     hidden [void] Modify([System.Collections.Hashtable] $property)
     {
+        Write-Verbose -Message $this.localizedData.Bootstrapping
+
+        Write-Debug -Message "Start-PSResourceGetBootstrap Parameters:`n$($property | Out-String)"
+
         Start-PSResourceGetBootstrap @property -Force -ErrorAction 'Stop'
     }
 

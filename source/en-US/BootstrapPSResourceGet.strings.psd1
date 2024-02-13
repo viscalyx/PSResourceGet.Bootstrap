@@ -16,4 +16,5 @@ ConvertFrom-StringData @'
     EvaluatingScope = Evaluation if module is present in the scope '{0}'. (BPSRG0004)
     EvaluatingDestination = Evaluating if module is present in the destination path '{0}'. (BPSRG0006)
     VersionInvalid = The version '{0}' is not a valid semantic version or one of the supported NuGet version ranges. (BPSRG0007)
+    Bootstrapping = Bootstrapping the module Microsoft.PowerShell.PSResourceGet. (BPSRG0008)
 '@

@@ -1,0 +1,4 @@
+enum SingleInstance
+{
+    Yes
+}
