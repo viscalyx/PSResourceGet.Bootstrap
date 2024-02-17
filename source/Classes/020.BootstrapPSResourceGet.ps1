@@ -50,10 +50,6 @@
         default value is 'CurrentUser'. This parameter may not be used at the same time
         as the parameter Destination.
 
-        The value 'None' is not allowed to use in a configuration, it is used internally
-        and  used in the output from method `Get()` to indicate that the module is not in
-        any scope.
-
     .PARAMETER Version
         Specifies the version of the Microsoft.PowerShell.PSResourceGet module to download.
         If not specified, the latest version will be downloaded.
@@ -102,13 +98,15 @@ class BootstrapPSResourceGet : ResourceBase
     $Destination
 
     <#
-        The ModuleScope is evaluated if exist in AssertProperties().
+        The ModuleScope is evaluated in AssertProperties(). This parameter cannot
+        use the ValidateSet() attribute since it is not possible to set a null value,
+        unless it is set to [ValidateSet('CurrentUser', 'AllUsers', $null)] .
 
         The parameter name Scope could not be used as it is a reserved keyword in
         PowerShell DSC, if used it throws an error when parsing a configuration.
     #>
     [DscProperty()]
-    [Nullable[Scope]]
+    [System.String]
     $ModuleScope
 
     # The Version is evaluated if exist in AssertProperties().
@@ -182,7 +180,7 @@ class BootstrapPSResourceGet : ResourceBase
                 $this.localizedData.EvaluatingScope -f $assignedDscProperties.ModuleScope
             )
 
-            $currentState.ModuleScope = 'None'
+            $currentState.ModuleScope = $null
 
             $testModuleExistParameters.Scope = $assignedDscProperties.ModuleScope
 
@@ -270,9 +268,20 @@ class BootstrapPSResourceGet : ResourceBase
 
         if ($property.Keys -contains 'ModuleScope')
         {
-            if ($property.ModuleScope -eq [Scope]::None)
+            <#
+                It is not possible to set a null value to the parameter ModuleScope
+                when it has a [ValidateSet()] unless it would be set to
+                [ValidateSet('CurrentUser', 'AllUsers', $null)]. But that would
+                give a strange output if giving the wrong value to the parameter:
+                E.g.
+
+                    'The argument "CurrentUser2" does not belong to the set
+                    "CurrentUser,AllUsers," specified by the ValidateSet
+                    attribute.'
+            #>
+            if ($property.ModuleScope -notin ('CurrentUser', 'AllUsers'))
             {
-                $errorMessage = $this.localizedData.ScopeNoneNotAllowed
+                $errorMessage = $this.localizedData.ModuleScopeInvalid -f $property.ModuleScope
 
                 New-InvalidArgumentException -ArgumentName 'ModuleScope' -Message $errorMessage
             }

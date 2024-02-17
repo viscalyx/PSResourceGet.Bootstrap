@@ -17,6 +17,6 @@ ConvertFrom-StringData @'
     EvaluatingDestination = Evaluating if module is present in the destination path '{0}'. (BPSRG0006)
     VersionInvalid = The version '{0}' is not a valid semantic version or one of the supported NuGet version ranges. (BPSRG0007)
     Bootstrapping = Bootstrapping the module Microsoft.PowerShell.PSResourceGet. (BPSRG0008)
-    ScopeNoneNotAllowed = The value 'None' is not allowed, it is used internally and returned in the output from Get(). (BPSRG0009)
     MissingRequiredParameter = At least one of the parameters 'ModuleScope' or 'Destination' bust be specified. (BPSRG0010)
+    ModuleScopeInvalid = The module scope '{0}' is not a valid module scope. The value must be one of "CurrentUser" or "AllUsers". (BPSRG0011)
 '@

@@ -92,7 +92,7 @@ Describe 'BootstrapPSResourceGet\Get()' -Tag 'Get' {
                     Add-Member -Force -MemberType 'ScriptMethod' -Name 'GetCurrentState' -Value {
                         return [System.Collections.Hashtable] @{
                             IsSingleInstance = 'Yes'
-                            ModuleScope      = [Scope]::CurrentUser
+                            ModuleScope      = 'CurrentUser'
                         }
                     } -PassThru |
                     Add-Member -Force -MemberType 'ScriptMethod' -Name 'AssertProperties' -Value {
@@ -106,7 +106,7 @@ Describe 'BootstrapPSResourceGet\Get()' -Tag 'Get' {
                 $currentState = $script:mockBootstrapPSResourceGetInstance.Get()
 
                 $currentState.IsSingleInstance | Should -Be 'Yes'
-                $currentState.ModuleScope | Should -Be ([Scope]::CurrentUser)
+                $currentState.ModuleScope | Should -Be 'CurrentUser'
                 $currentState.Destination | Should -BeNullOrEmpty
                 $currentState.Version | Should -BeNullOrEmpty
                 $currentState.Reasons | Should -BeNullOrEmpty
@@ -119,7 +119,7 @@ Describe 'BootstrapPSResourceGet\Get()' -Tag 'Get' {
             InModuleScope -ScriptBlock {
                 $script:mockBootstrapPSResourceGetInstance = [BootstrapPSResourceGet] @{
                     IsSingleInstance = 'Yes'
-                    ModuleScope      = [Scope]::CurrentUser
+                    ModuleScope      = 'CurrentUser'
                 }
 
                 <#
@@ -133,7 +133,7 @@ Describe 'BootstrapPSResourceGet\Get()' -Tag 'Get' {
                     Add-Member -Force -MemberType 'ScriptMethod' -Name 'GetCurrentState' -Value {
                         return [System.Collections.Hashtable] @{
                             IsSingleInstance = 'Yes'
-                            ModuleScope      = 'None'
+                            ModuleScope      = $null
                         }
                     } -PassThru |
                     Add-Member -Force -MemberType 'ScriptMethod' -Name 'AssertProperties' -Value {
@@ -147,13 +147,13 @@ Describe 'BootstrapPSResourceGet\Get()' -Tag 'Get' {
                 $currentState = $script:mockBootstrapPSResourceGetInstance.Get()
 
                 $currentState.IsSingleInstance | Should -Be 'Yes'
-                $currentState.ModuleScope | Should -Be ([Scope]::None)
+                $currentState.ModuleScope | Should -BeNullOrEmpty
                 $currentState.Destination | Should -BeNullOrEmpty
                 $currentState.Version | Should -BeNullOrEmpty
 
                 $currentState.Reasons | Should -HaveCount 1
                 $currentState.Reasons.Code | Should -Be 'BootstrapPSResourceGet:BootstrapPSResourceGet:ModuleScope'
-                $currentState.Reasons.Phrase | Should -Be 'The property ModuleScope should be "CurrentUser", but was "None"'
+                $currentState.Reasons.Phrase | Should -Be 'The property ModuleScope should be "CurrentUser", but was null'
             }
         }
     }
@@ -164,7 +164,7 @@ Describe 'BootstrapPSResourceGet\Set()' -Tag 'Set' {
         InModuleScope -ScriptBlock {
             $script:mockBootstrapPSResourceGetInstance = [BootstrapPSResourceGet] @{
                 IsSingleInstance = 'Yes'
-                ModuleScope      = [Scope]::CurrentUser
+                ModuleScope      = 'CurrentUser'
             } |
                 # Mock method Modify which is called by the base method Set().
                 Add-Member -Force -MemberType 'ScriptMethod' -Name 'Modify' -Value {
@@ -213,8 +213,8 @@ Describe 'BootstrapPSResourceGet\Set()' -Tag 'Set' {
                     Add-Member -Force -MemberType 'ScriptMethod' -Name 'Compare' -Value {
                         return @{
                             Property      = 'ModuleScope'
-                            ExpectedValue = [Scope]::CurrentUser
-                            ActualValue   = [Scope]::None
+                            ExpectedValue = 'CurrentUser'
+                            ActualValue   = $null
                         }
                     } -PassThru |
                     Add-Member -Force -MemberType 'ScriptMethod' -Name 'AssertProperties' -Value {
@@ -238,7 +238,7 @@ Describe 'BootstrapPSResourceGet\Test()' -Tag 'Test' {
         InModuleScope -ScriptBlock {
             $script:mockBootstrapPSResourceGetInstance = [BootstrapPSResourceGet] @{
                 IsSingleInstance = 'Yes'
-                ModuleScope      = [Scope]::CurrentUser
+                ModuleScope      = 'CurrentUser'
             }
         }
     }
@@ -272,8 +272,8 @@ Describe 'BootstrapPSResourceGet\Test()' -Tag 'Test' {
                     Add-Member -Force -MemberType 'ScriptMethod' -Name 'Compare' -Value {
                         return @{
                             Property      = 'ModuleScope'
-                            ExpectedValue = [Scope]::CurrentUser
-                            ActualValue   = [Scope]::None
+                            ExpectedValue = 'CurrentUser'
+                            ActualValue   = $null
                         }
                     } -PassThru |
                     Add-Member -Force -MemberType 'ScriptMethod' -Name 'AssertProperties' -Value {
@@ -297,7 +297,7 @@ Describe 'BootstrapPSResourceGet\GetCurrentState()' -Tag 'GetCurrentState' {
                 InModuleScope -ScriptBlock {
                     $script:mockBootstrapPSResourceGetInstance = [BootstrapPSResourceGet] @{
                         IsSingleInstance = 'Yes'
-                        ModuleScope      = [Scope]::CurrentUser
+                        ModuleScope      = 'CurrentUser'
                     }
                 }
 
@@ -315,7 +315,7 @@ Describe 'BootstrapPSResourceGet\GetCurrentState()' -Tag 'GetCurrentState' {
                     )
 
                     $currentState.IsSingleInstance | Should -Be 'Yes'
-                    $currentState.ModuleScope | Should -Be ([Scope]::None)
+                    $currentState.ModuleScope | Should -BeNullOrEmpty
                 }
             }
         }
@@ -325,7 +325,7 @@ Describe 'BootstrapPSResourceGet\GetCurrentState()' -Tag 'GetCurrentState' {
                 InModuleScope -ScriptBlock {
                     $script:mockBootstrapPSResourceGetInstance = [BootstrapPSResourceGet] @{
                         IsSingleInstance = 'Yes'
-                        ModuleScope      = [Scope]::CurrentUser
+                        ModuleScope      = 'CurrentUser'
                     }
                 }
 
@@ -343,7 +343,7 @@ Describe 'BootstrapPSResourceGet\GetCurrentState()' -Tag 'GetCurrentState' {
                     )
 
                     $currentState.IsSingleInstance | Should -Be 'Yes'
-                    $currentState.ModuleScope | Should -Be ([Scope]::CurrentUser)
+                    $currentState.ModuleScope | Should -Be 'CurrentUser'
                 }
             }
         }
@@ -355,7 +355,7 @@ Describe 'BootstrapPSResourceGet\GetCurrentState()' -Tag 'GetCurrentState' {
                 InModuleScope -ScriptBlock {
                     $script:mockBootstrapPSResourceGetInstance = [BootstrapPSResourceGet] @{
                         IsSingleInstance = 'Yes'
-                        ModuleScope      = [Scope]::AllUsers
+                        ModuleScope      = 'AllUsers'
                     }
                 }
 
@@ -373,7 +373,7 @@ Describe 'BootstrapPSResourceGet\GetCurrentState()' -Tag 'GetCurrentState' {
                     )
 
                     $currentState.IsSingleInstance | Should -Be 'Yes'
-                    $currentState.ModuleScope | Should -Be ([Scope]::None)
+                    $currentState.ModuleScope | Should -BeNullOrEmpty
                 }
             }
         }
@@ -383,7 +383,7 @@ Describe 'BootstrapPSResourceGet\GetCurrentState()' -Tag 'GetCurrentState' {
                 InModuleScope -ScriptBlock {
                     $script:mockBootstrapPSResourceGetInstance = [BootstrapPSResourceGet] @{
                         IsSingleInstance = 'Yes'
-                        ModuleScope      = [Scope]::AllUsers
+                        ModuleScope      = 'AllUsers'
                     }
                 }
 
@@ -401,7 +401,7 @@ Describe 'BootstrapPSResourceGet\GetCurrentState()' -Tag 'GetCurrentState' {
                     )
 
                     $currentState.IsSingleInstance | Should -Be 'Yes'
-                    $currentState.ModuleScope | Should -Be ([Scope]::AllUsers)
+                    $currentState.ModuleScope | Should -Be ('AllUsers')
                 }
             }
         }
@@ -557,7 +557,7 @@ Describe 'BootstrapPSResourceGet\GetCurrentState()' -Tag 'GetCurrentState' {
 
                     $currentState.IsSingleInstance | Should -Be 'Yes'
                     $currentState.Destination | Should -BeNullOrEmpty
-                    $currentState.ModuleScope | Should -Be ([Scope]::None)
+                    $currentState.ModuleScope | Should -BeNullOrEmpty
                     $currentState.Version | Should -BeNullOrEmpty
                 }
             }
@@ -588,7 +588,7 @@ Describe 'BootstrapPSResourceGet\GetCurrentState()' -Tag 'GetCurrentState' {
 
                     $currentState.IsSingleInstance | Should -Be 'Yes'
                     $currentState.Destination | Should -BeNullOrEmpty
-                    $currentState.ModuleScope | Should -Be ([Scope]::CurrentUser)
+                    $currentState.ModuleScope | Should -Be 'CurrentUser'
                     $currentState.Version | Should -Be '1.0.0'
                 }
             }
@@ -723,40 +723,13 @@ Describe 'BootstrapPSResourceGet\Modify()' -Tag 'Modify' {
 }
 
 Describe 'BootstrapPSResourceGet\AssertProperties()' -Tag 'AssertProperties' {
-    Context 'When passing parameter ModuleScope with the value ''None''' {
-        BeforeAll {
-            InModuleScope -ScriptBlock {
-                $script:mockBootstrapPSResourceGetInstance = [BootstrapPSResourceGet] @{
-                    IsSingleInstance = 'Yes'
-                    ModuleScope      = 'None'
-                }
-            }
-        }
-
-        It 'Should throw the correct error' {
-            InModuleScope -ScriptBlock {
-                $mockErrorMessage = $script:mockBootstrapPSResourceGetInstance.localizedData.ScopeNoneNotAllowed
-
-                $mockErrorMessage += ' (Parameter ''ModuleScope'')'
-
-                {
-                    $script:mockBootstrapPSResourceGetInstance.AssertProperties(
-                        @{
-                            ModuleScope = 'None'
-                        }
-                    )
-                } | Should -Throw -ExpectedMessage $mockErrorMessage
-            }
-        }
-    }
-
     <#
         These tests just check for the string localized ID. Since the error is part
-        of a command outside of SqlServerDsc, a small changes to the localized
-        string should not fail these tests.
+        of a command outside of PSResourceGet.Bootstrap a small change to the
+        localized string should not fail these tests.
     #>
     Context 'When passing mutually exclusive parameters' {
-        Context 'When passing ModuleScope and ModuleScope' {
+        Context 'When passing ModuleScope and Destination' {
             BeforeAll {
                 InModuleScope -ScriptBlock {
                     $script:mockBootstrapPSResourceGetInstance = [BootstrapPSResourceGet] @{
@@ -948,6 +921,47 @@ Describe 'BootstrapPSResourceGet\AssertProperties()' -Tag 'AssertProperties' {
                 $mockErrorMessage = $script:mockBootstrapPSResourceGetInstance.localizedData.MissingRequiredParameter
 
                 $mockErrorMessage += ' (Parameter ''ModuleScope, Destination'')'
+
+                { $script:mockBootstrapPSResourceGetInstance.Test() } | Should -Throw -ExpectedMessage $mockErrorMessage
+            }
+        }
+    }
+
+    Context 'When an invalid value is passed in ModuleScope' {
+        BeforeAll {
+            InModuleScope -ScriptBlock {
+                $script:mockBootstrapPSResourceGetInstance = [BootstrapPSResourceGet] @{
+                    IsSingleInstance = 'Yes'
+                    ModuleScope      = 'InvalidScope'
+                }
+            }
+        }
+
+        It 'Should throw the correct error for Get()' {
+            InModuleScope -ScriptBlock {
+                $mockErrorMessage = $script:mockBootstrapPSResourceGetInstance.localizedData.ModuleScopeInvalid -f 'InvalidScope'
+
+                $mockErrorMessage += ' (Parameter ''ModuleScope'')'
+
+                { $script:mockBootstrapPSResourceGetInstance.Get() } | Should -Throw -ExpectedMessage $mockErrorMessage
+            }
+        }
+
+        It 'Should throw the correct error for Set()' {
+            InModuleScope -ScriptBlock {
+                $mockErrorMessage = $script:mockBootstrapPSResourceGetInstance.localizedData.ModuleScopeInvalid -f 'InvalidScope'
+
+                $mockErrorMessage += ' (Parameter ''ModuleScope'')'
+
+                { $script:mockBootstrapPSResourceGetInstance.Set() } | Should -Throw -ExpectedMessage $mockErrorMessage
+            }
+        }
+
+        It 'Should throw the correct error for Test()' {
+            InModuleScope -ScriptBlock {
+                $mockErrorMessage = $script:mockBootstrapPSResourceGetInstance.localizedData.ModuleScopeInvalid -f 'InvalidScope'
+
+                $mockErrorMessage += ' (Parameter ''ModuleScope'')'
 
                 { $script:mockBootstrapPSResourceGetInstance.Test() } | Should -Throw -ExpectedMessage $mockErrorMessage
             }
