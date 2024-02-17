@@ -50,6 +50,10 @@
         default value is 'CurrentUser'. This parameter may not be used at the same time
         as the parameter Destination.
 
+        The value 'None' is not allowed to use in a configuration, it is used internally
+        and  used in the output from method `Get()` to indicate that the module is not in
+        any scope.
+
     .PARAMETER Version
         Specifies the version of the Microsoft.PowerShell.PSResourceGet module to download.
         If not specified, the latest version will be downloaded.
@@ -62,19 +66,34 @@
 
         This example shows how to call the resource using Invoke-DscResource. This
         example bootstraps the Microsoft.PowerShell.PSResourceGet module, saving
-        it to the appropriate location based on the default scope ('CurrentUser').
-        It will also save the compatibility module to the same location.
+        it to the appropriate location based on the scope `'CurrentUser'`.
+
+    .EXAMPLE
+        Invoke-DscResource -ModuleName PSResourceGet.Bootstrap -Name BootstrapPSResourceGet -Method Get -Property @{
+            IsSingleInstance = 'Yes'
+            ModuleScope      = 'CurrentUser'
+            Version          = '1.0.2'
+        }
+
+        This example shows how to call the resource using Invoke-DscResource. This
+        example bootstraps the Microsoft.PowerShell.PSResourceGet module with version
+        1.0.2, saving it to the appropriate location based on the scope `'CurrentUser'`.
+
+    .EXAMPLE
+        Invoke-DscResource -ModuleName PSResourceGet.Bootstrap -Name BootstrapPSResourceGet -Method Get -Property @{
+            IsSingleInstance = 'Yes'
+            Destination      = '/path/to/destination'
+        }
+
+        This example shows how to call the resource using Invoke-DscResource. This
+        example bootstraps the Microsoft.PowerShell.PSResourceGet module, saving it
+        to the path specified in the parameter `Destination`.
 #>
 [DscResource(RunAsCredential = 'Optional')]
 class BootstrapPSResourceGet : ResourceBase
 {
-    # [DscProperty(Key)]
-    # [SingleInstance]
-    # $IsSingleInstance
-
     [DscProperty(Key)]
-    [ValidateSet('Yes')]
-    [System.String]
+    [SingleInstance]
     $IsSingleInstance
 
     # The Destination is evaluated if exist in AssertProperties().
@@ -85,18 +104,21 @@ class BootstrapPSResourceGet : ResourceBase
     <#
         The ModuleScope is evaluated if exist in AssertProperties().
 
-        The name Scope could not be used as it is a reserved keyword in
+        The parameter name Scope could not be used as it is a reserved keyword in
         PowerShell DSC, if used it throws an error when parsing a configuration.
     #>
     [DscProperty()]
-    [ValidateSet('CurrentUser', 'AllUsers')]
-    [System.String]
+    [Nullable[Scope]]
     $ModuleScope
 
     # The Version is evaluated if exist in AssertProperties().
     [DscProperty()]
     [System.String]
     $Version
+
+    [DscProperty(NotConfigurable)]
+    [PSResourceGetBootstrapReason[]]
+    $Reasons
 
     BootstrapPSResourceGet () : base ($PSScriptRoot)
     {
@@ -132,7 +154,9 @@ class BootstrapPSResourceGet : ResourceBase
     {
         Write-Verbose -Message $this.localizedData.EvaluateModule
 
-        $currentState = @{}
+        $currentState = @{
+            IsSingleInstance = [SingleInstance]::Yes
+        }
 
         # Need to find out how to evaluate state since there are no key properties for that.
         $assignedDscProperties = $this | Get-DscProperty -HasValue -Attribute @(
@@ -148,7 +172,7 @@ class BootstrapPSResourceGet : ResourceBase
         {
             $testModuleExistParameters.Version = $assignedDscProperties.Version
 
-            $currentState.Version = ''
+            $currentState.Version = $null
         }
 
         # If it is ModuleScope wasn't specified, then destination was specified.
@@ -158,7 +182,7 @@ class BootstrapPSResourceGet : ResourceBase
                 $this.localizedData.EvaluatingScope -f $assignedDscProperties.ModuleScope
             )
 
-            $currentState.ModuleScope = ''
+            $currentState.ModuleScope = 'None'
 
             $testModuleExistParameters.Scope = $assignedDscProperties.ModuleScope
 
@@ -178,7 +202,7 @@ class BootstrapPSResourceGet : ResourceBase
                 $this.localizedData.EvaluatingDestination -f $assignedDscProperties.Destination
             )
 
-            $currentState.Destination = ''
+            $currentState.Destination = $null
 
             $testModuleExistParameters.Path = $assignedDscProperties.Destination
 
@@ -206,6 +230,13 @@ class BootstrapPSResourceGet : ResourceBase
     {
         Write-Verbose -Message $this.localizedData.Bootstrapping
 
+        if ($property.Keys -contains 'ModuleScope')
+        {
+            $property.Scope = $property.ModuleScope
+
+            $property.Remove('ModuleScope')
+        }
+
         Write-Debug -Message "Start-PSResourceGetBootstrap Parameters:`n$($property | Out-String)"
 
         Start-PSResourceGetBootstrap @property -Force -ErrorAction 'Stop'
@@ -230,8 +261,22 @@ class BootstrapPSResourceGet : ResourceBase
 
         Assert-BoundParameter @assertBoundParameterParameters
 
+        if ($property.Keys -notcontains 'ModuleScope' -and $property.Keys -notcontains 'Destination')
+        {
+            $errorMessage = $this.localizedData.MissingRequiredParameter
+
+            New-InvalidArgumentException -ArgumentName 'ModuleScope, Destination' -Message $errorMessage
+        }
+
         if ($property.Keys -contains 'ModuleScope')
         {
+            if ($property.ModuleScope -eq [Scope]::None)
+            {
+                $errorMessage = $this.localizedData.ScopeNoneNotAllowed
+
+                New-InvalidArgumentException -ArgumentName 'ModuleScope' -Message $errorMessage
+            }
+
             $scopeModulePath = Get-PSModulePath -Scope $property.ModuleScope
 
             if (-not (Test-Path -Path $scopeModulePath))
