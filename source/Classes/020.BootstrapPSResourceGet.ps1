@@ -150,7 +150,9 @@ class BootstrapPSResourceGet : ResourceBase
     #>
     hidden [System.Collections.Hashtable] GetCurrentState([System.Collections.Hashtable] $keyProperty)
     {
-        Write-Debug -Message "Enter GetCurrentState. Parameters:`n$($keyProperty | Out-String)"
+        Write-Debug -Message (
+            'Enter GetCurrentState. Parameters: {0}' -f ($keyProperty | ConvertTo-Json -Compress)
+        )
 
         Write-Verbose -Message $this.localizedData.EvaluateModule
 
@@ -218,7 +220,6 @@ class BootstrapPSResourceGet : ResourceBase
         }
 
         Write-Debug -Message 'Exit GetCurrentState'
-        Write-Verbose -Message 'Exit GetCurrentState' -Verbose
 
         return $currentState
     }
@@ -231,7 +232,9 @@ class BootstrapPSResourceGet : ResourceBase
     #>
     hidden [void] Modify([System.Collections.Hashtable] $property)
     {
-        Write-Debug -Message "Enter Modify. Parameters:`n$($property | Out-String)"
+        Write-Debug -Message (
+            'Enter Modify. Parameters: {0}' -f ($property | ConvertTo-Json -Compress)
+        )
 
         Write-Verbose -Message $this.localizedData.Bootstrapping
 
@@ -255,8 +258,9 @@ class BootstrapPSResourceGet : ResourceBase
     #>
     hidden [void] AssertProperties([System.Collections.Hashtable] $property)
     {
-        Write-Debug -Message "Enter AssertProperties. Parameters:`n$($property | Out-String)"
-        Write-Verbose -Message "Enter AssertProperties. Parameters:`n$($property | Out-String)" -Verbose
+        Write-Debug -Message (
+            'Enter AssertProperties. Parameters: {0}' -f ($property | ConvertTo-Json -Compress)
+        )
 
         # The properties ModuleScope and Destination are mutually exclusive.
         $assertBoundParameterParameters = @{
@@ -298,9 +302,20 @@ class BootstrapPSResourceGet : ResourceBase
                 New-InvalidArgumentException -ArgumentName 'ModuleScope' -Message $errorMessage
             }
 
+            Write-Verbose -Message "Evaluating if module is present in the scope '$($property.ModuleScope)'" -Verbose
             $scopeModulePath = Get-PSModulePath -Scope $property.ModuleScope
 
-            if (-not (Test-Path -Path $scopeModulePath))
+            Write-Verbose -Message (
+                '[Environment]::GetFolderPath(''MyDocuments''): {0}' -f [Environment]::GetFolderPath('MyDocuments')
+            )
+
+            Write-Verbose -Message (
+                '$IsCoreCLR: {0}' -f $IsCoreCLR
+            )
+
+            Write-Verbose -Message "The path that was returned for the scope '$($property.ModuleScope)' is '$scopeModulePath'" -Verbose
+
+            if ([System.String]::IsNullOrEmpty($scopeModulePath) -or -not (Test-Path -Path $scopeModulePath))
             {
                 $errorMessage = $this.localizedData.ScopePathInvalid -f $property.ModuleScope, $scopeModulePath
 
@@ -310,7 +325,7 @@ class BootstrapPSResourceGet : ResourceBase
 
         if ($property.Keys -contains 'Destination')
         {
-            if (-not (Test-Path -Path $property.Destination))
+            if ([System.String]::IsNullOrEmpty($property.Destination) -or -not (Test-Path -Path $property.Destination))
             {
                 $errorMessage = $this.localizedData.DestinationInvalid -f $property.Destination
 
