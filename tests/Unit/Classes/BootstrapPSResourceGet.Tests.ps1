@@ -782,7 +782,7 @@ Describe 'BootstrapPSResourceGet\AssertProperties()' -Tag 'AssertProperties' {
             InModuleScope -ScriptBlock {
                 $mockErrorMessage = $script:mockBootstrapPSResourceGetInstance.localizedData.ScopePathInvalid -f 'CurrentUser', (Get-PSModulePath -Scope 'CurrentUser')
 
-                $mockErrorMessage += ' (Parameter ''ModuleScope'')'
+                $mockErrorMessage += "*Parameter*ModuleScope*"
 
                 { $script:mockBootstrapPSResourceGetInstance.Get() } | Should -Throw -ExpectedMessage $mockErrorMessage
             }
@@ -792,7 +792,7 @@ Describe 'BootstrapPSResourceGet\AssertProperties()' -Tag 'AssertProperties' {
             InModuleScope -ScriptBlock {
                 $mockErrorMessage = $script:mockBootstrapPSResourceGetInstance.localizedData.ScopePathInvalid -f 'CurrentUser', (Get-PSModulePath -Scope 'CurrentUser')
 
-                $mockErrorMessage += ' (Parameter ''ModuleScope'')'
+                $mockErrorMessage += "*Parameter*ModuleScope*"
 
                 { $script:mockBootstrapPSResourceGetInstance.Set() } | Should -Throw -ExpectedMessage $mockErrorMessage
             }
@@ -802,7 +802,7 @@ Describe 'BootstrapPSResourceGet\AssertProperties()' -Tag 'AssertProperties' {
             InModuleScope -ScriptBlock {
                 $mockErrorMessage = $script:mockBootstrapPSResourceGetInstance.localizedData.ScopePathInvalid -f 'CurrentUser', (Get-PSModulePath -Scope 'CurrentUser')
 
-                $mockErrorMessage += ' (Parameter ''ModuleScope'')'
+                $mockErrorMessage += "*Parameter*ModuleScope*"
 
                 { $script:mockBootstrapPSResourceGetInstance.Test() } | Should -Throw -ExpectedMessage $mockErrorMessage
             }
@@ -827,7 +827,7 @@ Describe 'BootstrapPSResourceGet\AssertProperties()' -Tag 'AssertProperties' {
             InModuleScope -ScriptBlock {
                 $mockErrorMessage = $script:mockBootstrapPSResourceGetInstance.localizedData.DestinationInvalid -f $TestDrive
 
-                $mockErrorMessage += ' (Parameter ''Destination'')'
+                $mockErrorMessage += "*Parameter*Destination*"
 
                 { $script:mockBootstrapPSResourceGetInstance.Get() } | Should -Throw -ExpectedMessage $mockErrorMessage
             }
@@ -837,7 +837,7 @@ Describe 'BootstrapPSResourceGet\AssertProperties()' -Tag 'AssertProperties' {
             InModuleScope -ScriptBlock {
                 $mockErrorMessage = $script:mockBootstrapPSResourceGetInstance.localizedData.DestinationInvalid -f $TestDrive
 
-                $mockErrorMessage += ' (Parameter ''Destination'')'
+                $mockErrorMessage += "*Parameter*Destination*"
 
                 { $script:mockBootstrapPSResourceGetInstance.Set() } | Should -Throw -ExpectedMessage $mockErrorMessage
             }
@@ -847,7 +847,7 @@ Describe 'BootstrapPSResourceGet\AssertProperties()' -Tag 'AssertProperties' {
             InModuleScope -ScriptBlock {
                 $mockErrorMessage = $script:mockBootstrapPSResourceGetInstance.localizedData.DestinationInvalid -f $TestDrive
 
-                $mockErrorMessage += ' (Parameter ''Destination'')'
+                $mockErrorMessage += "*Parameter*Destination*"
 
                 { $script:mockBootstrapPSResourceGetInstance.Test() } | Should -Throw -ExpectedMessage $mockErrorMessage
             }
@@ -869,7 +869,7 @@ Describe 'BootstrapPSResourceGet\AssertProperties()' -Tag 'AssertProperties' {
             InModuleScope -ScriptBlock {
                 $mockErrorMessage = $script:mockBootstrapPSResourceGetInstance.localizedData.VersionInvalid -f '1.0.0:-WrongTag'
 
-                $mockErrorMessage += ' (Parameter ''Version'')'
+                $mockErrorMessage += "*Parameter*Version*"
 
                 { $script:mockBootstrapPSResourceGetInstance.Get() } | Should -Throw -ExpectedMessage $mockErrorMessage
             }
@@ -879,7 +879,7 @@ Describe 'BootstrapPSResourceGet\AssertProperties()' -Tag 'AssertProperties' {
             InModuleScope -ScriptBlock {
                 $mockErrorMessage = $script:mockBootstrapPSResourceGetInstance.localizedData.VersionInvalid -f '1.0.0:-WrongTag'
 
-                $mockErrorMessage += ' (Parameter ''Version'')'
+                $mockErrorMessage += "*Parameter*Version*"
 
                 { $script:mockBootstrapPSResourceGetInstance.Set() } | Should -Throw -ExpectedMessage $mockErrorMessage
             }
@@ -889,7 +889,7 @@ Describe 'BootstrapPSResourceGet\AssertProperties()' -Tag 'AssertProperties' {
             InModuleScope -ScriptBlock {
                 $mockErrorMessage = $script:mockBootstrapPSResourceGetInstance.localizedData.VersionInvalid -f '1.0.0:-WrongTag'
 
-                $mockErrorMessage += ' (Parameter ''Version'')'
+                $mockErrorMessage += "*Parameter*Version*"
 
                 { $script:mockBootstrapPSResourceGetInstance.Test() } | Should -Throw -ExpectedMessage $mockErrorMessage
             }
@@ -909,7 +909,7 @@ Describe 'BootstrapPSResourceGet\AssertProperties()' -Tag 'AssertProperties' {
             InModuleScope -ScriptBlock {
                 $mockErrorMessage = $script:mockBootstrapPSResourceGetInstance.localizedData.MissingRequiredParameter
 
-                $mockErrorMessage += ' (Parameter ''ModuleScope, Destination'')'
+                $mockErrorMessage += "*Parameter*ModuleScope, Destination*"
 
                 { $script:mockBootstrapPSResourceGetInstance.Get() } | Should -Throw -ExpectedMessage $mockErrorMessage
             }
@@ -919,7 +919,7 @@ Describe 'BootstrapPSResourceGet\AssertProperties()' -Tag 'AssertProperties' {
             InModuleScope -ScriptBlock {
                 $mockErrorMessage = $script:mockBootstrapPSResourceGetInstance.localizedData.MissingRequiredParameter
 
-                $mockErrorMessage += ' (Parameter ''ModuleScope, Destination'')'
+                $mockErrorMessage += "*Parameter*ModuleScope, Destination*"
 
                 { $script:mockBootstrapPSResourceGetInstance.Set() } | Should -Throw -ExpectedMessage $mockErrorMessage
             }
@@ -929,7 +929,7 @@ Describe 'BootstrapPSResourceGet\AssertProperties()' -Tag 'AssertProperties' {
             InModuleScope -ScriptBlock {
                 $mockErrorMessage = $script:mockBootstrapPSResourceGetInstance.localizedData.MissingRequiredParameter
 
-                $mockErrorMessage += ' (Parameter ''ModuleScope, Destination'')'
+                $mockErrorMessage += "*Parameter*ModuleScope, Destination*"
 
                 { $script:mockBootstrapPSResourceGetInstance.Test() } | Should -Throw -ExpectedMessage $mockErrorMessage
             }
@@ -950,7 +950,7 @@ Describe 'BootstrapPSResourceGet\AssertProperties()' -Tag 'AssertProperties' {
             InModuleScope -ScriptBlock {
                 $mockErrorMessage = $script:mockBootstrapPSResourceGetInstance.localizedData.ModuleScopeInvalid -f 'InvalidScope'
 
-                $mockErrorMessage += ' (Parameter ''ModuleScope'')'
+                $mockErrorMessage += "*Parameter*ModuleScope*"
 
                 { $script:mockBootstrapPSResourceGetInstance.Get() } | Should -Throw -ExpectedMessage $mockErrorMessage
             }
@@ -960,7 +960,7 @@ Describe 'BootstrapPSResourceGet\AssertProperties()' -Tag 'AssertProperties' {
             InModuleScope -ScriptBlock {
                 $mockErrorMessage = $script:mockBootstrapPSResourceGetInstance.localizedData.ModuleScopeInvalid -f 'InvalidScope'
 
-                $mockErrorMessage += ' (Parameter ''ModuleScope'')'
+                $mockErrorMessage += "*Parameter*ModuleScope*"
 
                 { $script:mockBootstrapPSResourceGetInstance.Set() } | Should -Throw -ExpectedMessage $mockErrorMessage
             }
@@ -970,7 +970,7 @@ Describe 'BootstrapPSResourceGet\AssertProperties()' -Tag 'AssertProperties' {
             InModuleScope -ScriptBlock {
                 $mockErrorMessage = $script:mockBootstrapPSResourceGetInstance.localizedData.ModuleScopeInvalid -f 'InvalidScope'
 
-                $mockErrorMessage += ' (Parameter ''ModuleScope'')'
+                $mockErrorMessage += "*Parameter*ModuleScope*"
 
                 { $script:mockBootstrapPSResourceGetInstance.Test() } | Should -Throw -ExpectedMessage $mockErrorMessage
             }
