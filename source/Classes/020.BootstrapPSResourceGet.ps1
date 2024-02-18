@@ -302,18 +302,19 @@ class BootstrapPSResourceGet : ResourceBase
                 New-InvalidArgumentException -ArgumentName 'ModuleScope' -Message $errorMessage
             }
 
-            Write-Verbose -Message "Evaluating if module is present in the scope '$($property.ModuleScope)'" -Verbose
-            $scopeModulePath = Get-PSModulePath -Scope $property.ModuleScope
+            Write-Verbose -Message "DEBUG: Running Get-PSModulePath: '$($property.ModuleScope)'" -Verbose
 
             Write-Verbose -Message (
-                'MyDocuments: {0}' -f [Environment]::GetFolderPath('MyDocuments')
-            )
+                'DEBUG: MyDocuments: {0}' -f [Environment]::GetFolderPath('MyDocuments')
+            ) -Verbose
 
-            # Write-Verbose -Message (
-            #     '$IsCoreCLR: {0}' -f (if( $IsCoreCLR) { 'True' } else { 'False' })
-            # )
+            Write-Verbose -Message (
+                'DEBUG: $IsCoreCLR: {0}' -f $global:IsCoreCLR
+            ) -Verbose
 
-            Write-Verbose -Message "The path that was returned for the scope '$($property.ModuleScope)' is '$scopeModulePath'" -Verbose
+            $scopeModulePath = Get-PSModulePath -Scope $property.ModuleScope
+
+            Write-Verbose -Message "DEBUG: The path that was returned for the scope '$($property.ModuleScope)' is '$scopeModulePath'" -Verbose
 
             if ([System.String]::IsNullOrEmpty($scopeModulePath) -or -not (Test-Path -Path $scopeModulePath))
             {
