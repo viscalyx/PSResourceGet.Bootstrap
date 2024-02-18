@@ -309,7 +309,7 @@ class BootstrapPSResourceGet : ResourceBase
             ) -Verbose
 
             Write-Verbose -Message (
-                'DEBUG: $IsCoreCLR: {0}' -f $global:IsCoreCLR
+                'DEBUG: $IsCoreCLR: {0}' -f $script:IsCoreCLR
             ) -Verbose
 
             $scopeModulePath = Get-PSModulePath -Scope $property.ModuleScope

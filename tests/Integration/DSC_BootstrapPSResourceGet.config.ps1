@@ -25,9 +25,9 @@ else
 
 <#
     .SYNOPSIS
-        Bootstraps Microsoft.PowerShell.PSResourceGet to scope CurrentUser.
+        Bootstraps Microsoft.PowerShell.PSResourceGet to scope AllUsers.
 #>
-Configuration DSC_BootstrapPSResourceGet_CurrentUser_Config
+Configuration DSC_BootstrapPSResourceGet_AllUsers_Config
 {
     Import-DscResource -ModuleName 'PSResourceGet.Bootstrap'
 
@@ -36,7 +36,7 @@ Configuration DSC_BootstrapPSResourceGet_CurrentUser_Config
         BootstrapPSResourceGet 'Integration_Test'
         {
             IsSingleInstance = 'Yes'
-            ModuleScope      = 'CurrentUser'
+            ModuleScope      = 'AllUsers'
         }
     }
 }

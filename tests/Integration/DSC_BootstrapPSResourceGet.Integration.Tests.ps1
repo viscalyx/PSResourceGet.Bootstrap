@@ -56,7 +56,7 @@ Describe "$($script:dscResourceName)_Integration" -Tag @('DSC') {
     }
 
     Context ('When using configuration <_>') -ForEach @(
-        "$($script:dscResourceName)_CurrentUser_Config"
+        "$($script:dscResourceName)_AllUsers_Config"
     ) {
         BeforeAll {
             $configurationName = $_
@@ -102,8 +102,8 @@ Describe "$($script:dscResourceName)_Integration" -Tag @('DSC') {
                 -and $_.ResourceId -eq $resourceId
             }
 
-            #$resourceCurrentState.IsSingleInstance | Should -Be 'Yes'
-            $resourceCurrentState.ModuleScope | Should -Be 'CurrentUser'
+            $resourceCurrentState.IsSingleInstance | Should -Be 'Yes'
+            $resourceCurrentState.ModuleScope | Should -Be 'AllUsers'
         }
 
         It 'Should return ''True'' when Test-DscConfiguration is run' {
