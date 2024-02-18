@@ -153,7 +153,16 @@ Describe 'BootstrapPSResourceGet\Get()' -Tag 'Get' {
 
                 $currentState.Reasons | Should -HaveCount 1
                 $currentState.Reasons.Code | Should -Be 'BootstrapPSResourceGet:BootstrapPSResourceGet:ModuleScope'
-                $currentState.Reasons.Phrase | Should -Be 'The property ModuleScope should be "CurrentUser", but was null'
+
+                # The output is different between Windows PowerShell and PowerShell.
+                if ($IsCoreCLR)
+                {
+                    $currentState.Reasons.Phrase | Should -Be 'The property ModuleScope should be "CurrentUser", but was null'
+                }
+                else
+                {
+                    $currentState.Reasons.Phrase | Should -Be 'The property ModuleScope should be "CurrentUser", but was ""'
+                }
             }
         }
     }
