@@ -47,7 +47,7 @@ This will bootstraps the _Microsoft.PowerShell.PSResourceGet_ module, saving
 it to the specified destination path `C:\Modules`.
 
 >[!TIP]
->The bootstrap script has the same parameter sets as the command [`Start-PSResourceGetBootstrap`](Start-PSResourceGetBootstrap).
+>The bootstrap script has the same parameter sets as the command [`Start-PSResourceGetBootstrap`](https://github.com/viscalyx/PSResourceGet.Bootstrap/wiki/Start-PSResourceGetBootstrap).
 
 ### Download the module from PowerShell Gallery
 

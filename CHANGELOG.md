@@ -13,6 +13,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 - Reverted resolve dependency logic so that GitHub actions works.
 - Link to `Start-PSResourceGetBootstrap` in Home.md now works ([issue #13](https://github.com/viscalyx/PSResourceGet.Bootstrap/issues/13)).
+- Wiki now has correct header for the resources.
 
 ## [0.1.2] - 2024-02-03
 
