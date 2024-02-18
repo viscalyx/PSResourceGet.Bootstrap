@@ -83,6 +83,7 @@ Describe 'Script Analyzer Rules' {
             $parseErrorTypes = @(
                 'TypeNotFound'
                 'RequiresModuleInvalid'
+                'DscResourceInvalidKeyProperty'
             )
 
             # Filter out reported parse errors that is unable to be resolved in source files

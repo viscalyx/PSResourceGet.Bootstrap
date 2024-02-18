@@ -5,6 +5,10 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+### Added
+
+- DSC class-based resource `BootstrapPSResourceGet'.
+
 ### Fixed
 
 - Reverted resolve dependency logic so that GitHub actions works.

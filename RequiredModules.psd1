@@ -21,6 +21,7 @@
     #xDscResourceDesigner           = 'latest'
 
     # Build dependencies needed for using the module
+    'DscResource.Base'             = 'latest'
     #'DscResource.Common'           = 'latest'
     'DscResource.Common'           = @{
         Version    = 'latest'
@@ -28,6 +29,7 @@
             AllowPrerelease = $true
         }
     }
+
     # Analyzer rules
     'DscResource.AnalyzerRules'    = 'latest'
     'Indented.ScriptAnalyzerRules' = 'latest'

@@ -77,6 +77,7 @@
 
         TypeNotFound - Because classes in the project cannot be found unless built.
         RequiresModuleInvalid - Because 'using module' in prefix.ps1 cannot be resolved as source file.
+        DscResourceInvalidKeyProperty - Because the enum type are not defined in the source file, only built module.
     #>
     ExcludeRules        = @()
 
