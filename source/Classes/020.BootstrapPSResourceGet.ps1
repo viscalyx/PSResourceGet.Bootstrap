@@ -306,12 +306,12 @@ class BootstrapPSResourceGet : ResourceBase
             $scopeModulePath = Get-PSModulePath -Scope $property.ModuleScope
 
             Write-Verbose -Message (
-                '[Environment]::GetFolderPath(''MyDocuments''): {0}' -f [Environment]::GetFolderPath('MyDocuments')
+                'MyDocuments: {0}' -f [Environment]::GetFolderPath('MyDocuments')
             )
 
-            Write-Verbose -Message (
-                '$IsCoreCLR: {0}' -f $IsCoreCLR
-            )
+            # Write-Verbose -Message (
+            #     '$IsCoreCLR: {0}' -f (if( $IsCoreCLR) { 'True' } else { 'False' })
+            # )
 
             Write-Verbose -Message "The path that was returned for the scope '$($property.ModuleScope)' is '$scopeModulePath'" -Verbose
 
