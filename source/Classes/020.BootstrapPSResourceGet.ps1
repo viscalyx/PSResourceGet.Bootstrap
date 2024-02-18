@@ -150,6 +150,8 @@ class BootstrapPSResourceGet : ResourceBase
     #>
     hidden [System.Collections.Hashtable] GetCurrentState([System.Collections.Hashtable] $keyProperty)
     {
+        Write-Debug -Message "Enter GetCurrentState. Parameters:`n$($keyProperty | Out-String)"
+
         Write-Verbose -Message $this.localizedData.EvaluateModule
 
         $currentState = @{
@@ -215,6 +217,9 @@ class BootstrapPSResourceGet : ResourceBase
             }
         }
 
+        Write-Debug -Message 'Exit GetCurrentState'
+        Write-Verbose -Message 'Exit GetCurrentState' -Verbose
+
         return $currentState
     }
 
@@ -226,6 +231,8 @@ class BootstrapPSResourceGet : ResourceBase
     #>
     hidden [void] Modify([System.Collections.Hashtable] $property)
     {
+        Write-Debug -Message "Enter Modify. Parameters:`n$($property | Out-String)"
+
         Write-Verbose -Message $this.localizedData.Bootstrapping
 
         if ($property.Keys -contains 'ModuleScope')
@@ -238,6 +245,8 @@ class BootstrapPSResourceGet : ResourceBase
         Write-Debug -Message "Start-PSResourceGetBootstrap Parameters:`n$($property | Out-String)"
 
         Start-PSResourceGetBootstrap @property -Force -ErrorAction 'Stop'
+
+        Write-Debug -Message 'Exit Modify'
     }
 
     <#
@@ -246,6 +255,9 @@ class BootstrapPSResourceGet : ResourceBase
     #>
     hidden [void] AssertProperties([System.Collections.Hashtable] $property)
     {
+        Write-Debug -Message "Enter AssertProperties. Parameters:`n$($property | Out-String)"
+        Write-Verbose -Message "Enter AssertProperties. Parameters:`n$($property | Out-String)" -Verbose
+
         # The properties ModuleScope and Destination are mutually exclusive.
         $assertBoundParameterParameters = @{
             BoundParameterList     = $property
@@ -322,5 +334,7 @@ class BootstrapPSResourceGet : ResourceBase
                 New-InvalidArgumentException -ArgumentName 'Version' -Message $errorMessage
             }
         }
+
+        Write-Debug -Message 'Exit AssertProperties'
     }
 }

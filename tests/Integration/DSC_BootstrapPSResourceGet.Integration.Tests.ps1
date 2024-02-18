@@ -83,6 +83,7 @@ Describe "$($script:dscResourceName)_Integration" -Tag @('DSC') {
                     Verbose      = $true
                     Force        = $true
                     ErrorAction  = 'Stop'
+                    Debug        = $true
                 }
 
                 Start-DscConfiguration @startDscConfigurationParameters
