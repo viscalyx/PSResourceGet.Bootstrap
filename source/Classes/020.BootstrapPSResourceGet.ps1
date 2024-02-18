@@ -302,19 +302,7 @@ class BootstrapPSResourceGet : ResourceBase
                 New-InvalidArgumentException -ArgumentName 'ModuleScope' -Message $errorMessage
             }
 
-            Write-Verbose -Message "DEBUG: Running Get-PSModulePath: '$($property.ModuleScope)'" -Verbose
-
-            Write-Verbose -Message (
-                'DEBUG: MyDocuments: {0}' -f [Environment]::GetFolderPath('MyDocuments')
-            ) -Verbose
-
-            Write-Verbose -Message (
-                'DEBUG: $IsCoreCLR: {0}' -f $script:IsCoreCLR
-            ) -Verbose
-
             $scopeModulePath = Get-PSModulePath -Scope $property.ModuleScope
-
-            Write-Verbose -Message "DEBUG: The path that was returned for the scope '$($property.ModuleScope)' is '$scopeModulePath'" -Verbose
 
             if ([System.String]::IsNullOrEmpty($scopeModulePath) -or -not (Test-Path -Path $scopeModulePath))
             {
