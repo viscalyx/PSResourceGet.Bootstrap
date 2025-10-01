@@ -61,7 +61,7 @@ stages:
       - job: Test_HQRM
         displayName: 'HQRM'
         pool:
-          vmImage: 'windows-2022'
+          vmImage: 'windows-latest'
         timeoutInMinutes: 0
         steps:
           - task: DownloadPipelineArtifact@2
@@ -301,10 +301,10 @@ stages:
         strategy:
           matrix:
             WIN2019_PWSH:
-              JOB_VMIMAGE: 'windows-2019'
+              JOB_VMIMAGE: 'windows-2025'
               PWSH: true
             WIN2019:
-              JOB_VMIMAGE: 'windows-2019'
+              JOB_VMIMAGE: 'windows-2025'
               PWSH: false
             WIN2022_PWSH:
               JOB_VMIMAGE: 'windows-2022'
@@ -348,7 +348,7 @@ stages:
         strategy:
           matrix:
             WIN2019:
-              JOB_VMIMAGE: 'windows-2019'
+              JOB_VMIMAGE: 'windows-2025'
               PWSH: false
             WIN2022:
               JOB_VMIMAGE: 'windows-2022'
@@ -392,10 +392,10 @@ stages:
         strategy:
           matrix:
             WIN2019_PWSH:
-              JOB_VMIMAGE: 'windows-2019'
+              JOB_VMIMAGE: 'windows-2025'
               PWSH: true
             WIN2019:
-              JOB_VMIMAGE: 'windows-2019'
+              JOB_VMIMAGE: 'windows-2025'
               PWSH: false
             WIN2022_PWSH:
               JOB_VMIMAGE: 'windows-2022'
