@@ -279,7 +279,7 @@ class BootstrapPSResourceGet : ResourceBase
         {
             $errorMessage = $this.localizedData.MissingRequiredParameter
 
-            New-InvalidArgumentException -ArgumentName 'ModuleScope, Destination' -Message $errorMessage
+            New-ArgumentException -ArgumentName 'ModuleScope, Destination' -Message $errorMessage
         }
 
         if ($property.Keys -contains 'ModuleScope')
@@ -299,7 +299,7 @@ class BootstrapPSResourceGet : ResourceBase
             {
                 $errorMessage = $this.localizedData.ModuleScopeInvalid -f $property.ModuleScope
 
-                New-InvalidArgumentException -ArgumentName 'ModuleScope' -Message $errorMessage
+                New-ArgumentException -ArgumentName 'ModuleScope' -Message $errorMessage
             }
 
             $scopeModulePath = Get-PSModulePath -Scope $property.ModuleScope
@@ -308,7 +308,7 @@ class BootstrapPSResourceGet : ResourceBase
             {
                 $errorMessage = $this.localizedData.ScopePathInvalid -f $property.ModuleScope, $scopeModulePath
 
-                New-InvalidArgumentException -ArgumentName 'ModuleScope' -Message $errorMessage
+                New-ArgumentException -ArgumentName 'ModuleScope' -Message $errorMessage
             }
         }
 
@@ -318,7 +318,7 @@ class BootstrapPSResourceGet : ResourceBase
             {
                 $errorMessage = $this.localizedData.DestinationInvalid -f $property.Destination
 
-                New-InvalidArgumentException -ArgumentName 'Destination' -Message $errorMessage
+                New-ArgumentException -ArgumentName 'Destination' -Message $errorMessage
             }
         }
 
@@ -335,7 +335,7 @@ class BootstrapPSResourceGet : ResourceBase
             {
                 $errorMessage = $this.localizedData.VersionInvalid -f $property.Version
 
-                New-InvalidArgumentException -ArgumentName 'Version' -Message $errorMessage
+                New-ArgumentException -ArgumentName 'Version' -Message $errorMessage
             }
         }
 
