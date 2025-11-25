@@ -10,6 +10,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - Bump Stale action to v10.
 - Bump Checkout action to v5.
 - Bump action codeql-action/upload-sarif to v4
+- Bump action checkout to v6
 
 ## [0.2.0] - 2024-02-18
 
